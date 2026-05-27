@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useLocation } from "wouter";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import type { Layer, PathOptions, LeafletMouseEvent } from "leaflet";
@@ -8,7 +9,7 @@ import {
   getGetCoverageQueryKey,
 } from "@workspace/api-client-react";
 import type { CountryCoverage } from "@workspace/api-client-react";
-import { X, ExternalLink, Loader2 } from "lucide-react";
+import { X, ExternalLink, Loader2, Terminal } from "lucide-react";
 
 const TIER_FILL: Record<number, string> = {
   1: "#22c55e",
@@ -16,11 +17,6 @@ const TIER_FILL: Record<number, string> = {
   3: "#ef4444",
 };
 
-const TIER_FILL_HOVER: Record<number, string> = {
-  1: "#16a34a",
-  2: "#d97706",
-  3: "#dc2626",
-};
 
 const TIER_LABELS: Record<number, { label: string; desc: string; color: string }> = {
   1: { label: "Tier 1 — Live API", desc: "Real-time authoritative validation", color: "text-emerald-700 dark:text-emerald-400" },
@@ -67,6 +63,7 @@ function DetailPanel({
   coverage: CountryCoverage | undefined;
   onClose: () => void;
 }) {
+  const [, setLocation] = useLocation();
   const { data: detail, isLoading } = useGetCoverage(countryCode, {
     query: {
       enabled: !!countryCode,
@@ -75,6 +72,7 @@ function DetailPanel({
   });
 
   const tierInfo = coverage ? TIER_LABELS[coverage.tier] : null;
+  const canTry = coverage && coverage.tier !== 3;
 
   return (
     <div
@@ -161,6 +159,21 @@ function DetailPanel({
             {detail.data_source}
             <ExternalLink className="h-3 w-3" />
           </a>
+
+          <button
+            data-testid="button-try-validation"
+            disabled={!canTry}
+            onClick={() => setLocation(`/try?country=${countryCode}`)}
+            className={[
+              "mt-2 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-medium transition-colors",
+              canTry
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-muted text-muted-foreground cursor-not-allowed",
+            ].join(" ")}
+          >
+            <Terminal className="h-3.5 w-3.5" />
+            {canTry ? "Try validation" : "Restricted — no validation available"}
+          </button>
         </div>
       )}
     </div>
