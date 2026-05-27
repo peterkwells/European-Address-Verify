@@ -42,10 +42,21 @@ router.get(
       return;
     }
 
-    if (!postcode || !postcode.trim() || postcode.toLowerCase() === "undefined") {
+    const trimmedPostcode = postcode.trim();
+    if (!trimmedPostcode || trimmedPostcode.toLowerCase() === "undefined") {
       sendError(res, 400, "invalid_request", "postcode is required", [
         { field: "postcode", message: "This field is required" },
       ]);
+      return;
+    }
+    if (!/[a-zA-Z0-9]/.test(trimmedPostcode)) {
+      sendError(
+        res,
+        422,
+        "unprocessable_entity",
+        "postcode must contain at least one alphanumeric character",
+        [{ field: "postcode", message: "Must contain at least one letter or digit" }],
+      );
       return;
     }
 

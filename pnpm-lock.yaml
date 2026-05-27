@@ -184,6 +184,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      i18n-zipcodes:
+        specifier: ^5.0.0
+        version: 5.0.0
       pino:
         specifier: ^9.14.0
         version: 9.14.0
@@ -2113,6 +2116,9 @@ packages:
   human-signals@8.0.1:
     resolution: {integrity: sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ==}
     engines: {node: '>=18.18.0'}
+
+  i18n-zipcodes@5.0.0:
+    resolution: {integrity: sha512-K/bs+8MydxAUTQj7LUCKSQfLJyD5IwTCiw6aYCcaVnextRRgLVKD8Gjtb7wiukAV7BLVZCstm0RG217IGJgBGg==}
 
   iconv-lite@0.7.2:
     resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
@@ -4705,6 +4711,8 @@ snapshots:
       toidentifier: 1.0.1
 
   human-signals@8.0.1: {}
+
+  i18n-zipcodes@5.0.0: {}
 
   iconv-lite@0.7.2:
     dependencies:

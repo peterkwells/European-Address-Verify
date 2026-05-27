@@ -227,7 +227,7 @@ export async function validateNO(
 
   const addr = data.adresser[0]!;
   const normalised: NormalisedAddress = {
-    house_number: addr.nummer ?? null,
+    house_number: addr.nummer != null ? String(addr.nummer) : null,
     street: addr.adressenavn ?? null,
     city: addr.poststed ?? null,
     postcode: addr.postnummer ?? null,

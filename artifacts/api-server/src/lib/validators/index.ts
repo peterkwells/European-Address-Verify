@@ -22,10 +22,10 @@ export async function validate(input: AddressInput): Promise<ValidationResult> {
       return validateBulkLocal(input);
 
     case "format+reference":
-      return validateFormatReference(input, "format+reference");
+      return await validateFormatReference(input, "format+reference");
 
     case "format-only":
-      return validateFormatReference(input, "format-only");
+      return await validateFormatReference(input, "format-only");
 
     case "restricted":
       return {
