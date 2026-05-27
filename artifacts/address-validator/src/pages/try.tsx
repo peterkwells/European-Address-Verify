@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
+import { useState, useEffect, useMemo } from "react";
+import { useLocation, useSearch } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -45,25 +45,35 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const CONFIDENCE_LABELS: Record<string, { label: string; desc: string; pct: number }> = {
-  high: { label: "High", desc: "Full address matched against authoritative source", pct: 100 },
-  medium: { label: "Medium", desc: "Postcode + city matched", pct: 66 },
-  low: { label: "Low", desc: "Postcode format only", pct: 33 },
-  unknown: { label: "Unknown", desc: "Restricted or unavailable", pct: 0 },
-};
-
-const CONFIDENCE_BAR: Record<string, string> = {
-  high: "bg-emerald-500",
-  medium: "bg-amber-500",
-  low: "bg-orange-500",
-  unknown: "bg-muted-foreground",
-};
-
-const CONFIDENCE_TEXT: Record<string, string> = {
-  high: "text-emerald-700 dark:text-emerald-400",
-  medium: "text-amber-700 dark:text-amber-400",
-  low: "text-orange-700 dark:text-orange-400",
-  unknown: "text-muted-foreground",
+const CONFIDENCE_META: Record<string, { label: string; desc: string; pct: number; bar: string; text: string }> = {
+  high: {
+    label: "High",
+    desc: "Full address matched against authoritative source",
+    pct: 100,
+    bar: "bg-emerald-500",
+    text: "text-emerald-700 dark:text-emerald-400",
+  },
+  medium: {
+    label: "Medium",
+    desc: "Postcode + city matched",
+    pct: 66,
+    bar: "bg-amber-500",
+    text: "text-amber-700 dark:text-amber-400",
+  },
+  low: {
+    label: "Low",
+    desc: "Postcode format only",
+    pct: 33,
+    bar: "bg-orange-500",
+    text: "text-orange-700 dark:text-orange-400",
+  },
+  unknown: {
+    label: "Unknown",
+    desc: "Restricted or unavailable",
+    pct: 0,
+    bar: "bg-muted",
+    text: "text-muted-foreground",
+  },
 };
 
 const METHOD_LABELS: Record<string, string> = {
@@ -91,46 +101,88 @@ function ResultRow({ label, value }: { label: string; value: React.ReactNode }) 
   );
 }
 
-const EXAMPLE_ADDRESSES: {
-  country: string;
-  postcode: string;
-  city?: string;
-  label: string;
-}[] = [
-  { country: "FR", postcode: "75001", city: "Paris", label: "Paris, France" },
-  { country: "DE", postcode: "10115", city: "Berlin", label: "Berlin, Germany" },
-  { country: "NL", postcode: "1012AB", city: "Amsterdam", label: "Amsterdam, NL" },
-  { country: "ES", postcode: "28001", city: "Madrid", label: "Madrid, Spain" },
-  { country: "GB", postcode: "SW1A 1AA", city: "London", label: "London, UK (restricted)" },
-];
+function JsonHighlight({ json }: { json: unknown }) {
+  const lines = JSON.stringify(json, null, 2).split("\n");
+  return (
+    <pre
+      className="overflow-x-auto p-4 text-xs leading-relaxed font-mono"
+      data-testid="result-raw-json"
+    >
+      {lines.map((line, i) => {
+        const keyMatch = line.match(/^(\s*)("[\w_]+")(: )(.*)$/);
+        if (keyMatch) {
+          const [, indent, key, colon, rest] = keyMatch;
+          let valueNode: React.ReactNode = rest;
+          if (rest === "true" || rest === "false") {
+            valueNode = <span className="text-amber-600 dark:text-amber-400">{rest}</span>;
+          } else if (rest === "null") {
+            valueNode = <span className="text-muted-foreground">{rest}</span>;
+          } else if (/^-?\d/.test(rest)) {
+            valueNode = <span className="text-blue-600 dark:text-blue-400">{rest}</span>;
+          } else if (rest.startsWith('"')) {
+            valueNode = <span className="text-emerald-700 dark:text-emerald-400">{rest}</span>;
+          }
+          return (
+            <span key={i}>
+              {indent}
+              <span className="text-violet-700 dark:text-violet-400">{key}</span>
+              {colon}
+              {valueNode}
+              {"\n"}
+            </span>
+          );
+        }
+        return <span key={i}>{line + "\n"}</span>;
+      })}
+    </pre>
+  );
+}
 
 const PLACEHOLDER_PARAMS: ValidateAddressParams = { country: "XX", postcode: "00000" };
 
 export default function Try() {
   const [, setLocation] = useLocation();
+  const searchStr = useSearch();
   const { data: coverageData } = useListCoverage();
   const [submittedParams, setSubmittedParams] = useState<ValidateAddressParams | null>(null);
 
-  const activeParams = submittedParams ?? PLACEHOLDER_PARAMS;
-
-  const { data: result, isLoading, error, isFetching } = useValidateAddress(
-    activeParams,
-    {
-      query: {
-        enabled: submittedParams !== null,
-        queryKey: getValidateAddressQueryKey(activeParams),
-      },
-    }
-  );
+  const countryFromUrl = useMemo(() => {
+    const p = new URLSearchParams(searchStr);
+    return p.get("country") ?? "";
+  }, [searchStr]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      country: "",
+      country: countryFromUrl,
       postcode: "",
       city: "",
       street: "",
       house_number: "",
+    },
+  });
+
+  useEffect(() => {
+    if (countryFromUrl) {
+      form.setValue("country", countryFromUrl, { shouldValidate: false });
+    }
+  }, [countryFromUrl, form]);
+
+  const exampleAddresses = useMemo(() => {
+    if (!coverageData?.countries) return [];
+    const countries = coverageData.countries;
+    const tier1 = countries.filter((c) => c.tier === 1).slice(0, 3);
+    const tier2 = countries.filter((c) => c.tier === 2).slice(0, 1);
+    const restricted = countries.filter((c) => c.tier === 3).slice(0, 1);
+    return [...tier1, ...tier2, ...restricted];
+  }, [coverageData]);
+
+  const activeParams = submittedParams ?? PLACEHOLDER_PARAMS;
+
+  const { data: result, isLoading, error, isFetching } = useValidateAddress(activeParams, {
+    query: {
+      enabled: submittedParams !== null,
+      queryKey: getValidateAddressQueryKey(activeParams),
     },
   });
 
@@ -145,25 +197,22 @@ export default function Try() {
     setSubmittedParams(p);
   }
 
-  function loadExample(ex: (typeof EXAMPLE_ADDRESSES)[number]) {
-    form.setValue("country", ex.country);
-    form.setValue("postcode", ex.postcode);
-    form.setValue("city", ex.city ?? "");
+  function loadExample(countryCode: string) {
+    form.setValue("country", countryCode, { shouldValidate: true });
+    form.setValue("postcode", "");
+    form.setValue("city", "");
     form.setValue("street", "");
     form.setValue("house_number", "");
     setSubmittedParams(null);
   }
 
   const apiError = error as { data?: { message?: string }; status?: number } | null;
-  const confidenceInfo = result ? CONFIDENCE_LABELS[result.confidence] : null;
+  const confidenceMeta = result ? CONFIDENCE_META[result.confidence] : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <h1
-          className="text-2xl font-bold tracking-tight text-foreground"
-          data-testid="heading-try"
-        >
+        <h1 className="text-2xl font-bold tracking-tight text-foreground" data-testid="heading-try">
           API Explorer
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -172,23 +221,29 @@ export default function Try() {
         </p>
       </div>
 
-      <div className="mb-5">
-        <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          Quick examples
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {EXAMPLE_ADDRESSES.map((ex) => (
-            <button
-              key={ex.label}
-              data-testid={`button-example-${ex.country.toLowerCase()}`}
-              onClick={() => loadExample(ex)}
-              className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-            >
-              {ex.label}
-            </button>
-          ))}
+      {exampleAddresses.length > 0 && (
+        <div className="mb-5">
+          <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Quick examples
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {exampleAddresses.map((c) => (
+              <button
+                key={c.country_code}
+                data-testid={`button-example-${c.country_code.toLowerCase()}`}
+                onClick={() => loadExample(c.country_code)}
+                className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              >
+                <span className="font-mono mr-1">{c.country_code}</span>
+                {c.country_name}
+                {c.tier === 3 && (
+                  <span className="ml-1 text-red-500 text-[10px]">(restricted)</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Form */}
@@ -369,10 +424,7 @@ export default function Try() {
               <div className="flex items-center gap-3">
                 <ValidIcon valid={result.valid} />
                 <div>
-                  <p
-                    className="text-sm font-semibold text-foreground"
-                    data-testid="result-valid"
-                  >
+                  <p className="text-sm font-semibold text-foreground" data-testid="result-valid">
                     {result.valid === true
                       ? "Address is valid"
                       : result.valid === false
@@ -395,30 +447,27 @@ export default function Try() {
               </div>
 
               {/* Confidence bar */}
-              {confidenceInfo && (
+              {confidenceMeta && (
                 <div data-testid="result-confidence">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-muted-foreground">Confidence</span>
-                    <span className={`text-xs font-semibold ${CONFIDENCE_TEXT[result.confidence]}`}>
-                      {confidenceInfo.label}
+                    <span className={`text-xs font-semibold ${confidenceMeta.text}`}>
+                      {confidenceMeta.label}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${CONFIDENCE_BAR[result.confidence]}`}
-                      style={{ width: `${confidenceInfo.pct}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${confidenceMeta.bar}`}
+                      style={{ width: `${confidenceMeta.pct}%` }}
                     />
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">{confidenceInfo.desc}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{confidenceMeta.desc}</p>
                 </div>
               )}
 
               {/* Summary rows */}
               <div className="rounded-md border border-border bg-muted/30 px-4">
-                <ResultRow
-                  label="Method"
-                  value={METHOD_LABELS[result.method] ?? result.method}
-                />
+                <ResultRow label="Method" value={METHOD_LABELS[result.method] ?? result.method} />
                 <ResultRow
                   label="Licence"
                   value={<code className="text-xs font-mono">{result.licence}</code>}
@@ -427,9 +476,7 @@ export default function Try() {
                   <ResultRow
                     label="Postcode (norm.)"
                     value={
-                      <code className="text-xs font-mono">
-                        {result.normalised_address.postcode}
-                      </code>
+                      <code className="text-xs font-mono">{result.normalised_address.postcode}</code>
                     }
                   />
                 )}
@@ -460,39 +507,38 @@ export default function Try() {
                 </div>
               )}
 
-              {/* Raw JSON response */}
+              {/* Raw JSON response with syntax highlighting */}
               <div>
-                <p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Raw JSON response
-                </p>
-                <div className="rounded-md border border-border bg-muted/40 overflow-hidden">
-                  <div className="flex items-center justify-between border-b border-border px-3 py-2">
-                    <span className="text-xs text-muted-foreground font-mono">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Raw JSON response
+                  </p>
+                  <a
+                    href={result.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                    data-testid="link-result-source"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+                <div className="rounded-md border border-border bg-[hsl(var(--muted)/0.4)] overflow-hidden">
+                  <div className="border-b border-border px-3 py-2">
+                    <span className="text-xs text-muted-foreground font-mono break-all">
                       GET /api/v1/addresses/validate?country={submittedParams?.country}&amp;postcode=
                       {encodeURIComponent(submittedParams?.postcode ?? "")}
-                      {submittedParams?.city ? `&city=${encodeURIComponent(submittedParams.city)}` : ""}
+                      {submittedParams?.city
+                        ? `&city=${encodeURIComponent(submittedParams.city)}`
+                        : ""}
                     </span>
-                    <a
-                      href={result.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                      data-testid="link-result-source"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
                   </div>
-                  <pre
-                    className="overflow-x-auto p-4 text-xs leading-relaxed text-foreground font-mono"
-                    data-testid="result-raw-json"
-                  >
-                    <code>{JSON.stringify(result, null, 2)}</code>
-                  </pre>
+                  <JsonHighlight json={result} />
                 </div>
               </div>
 
               <button
-                data-testid="button-validate-another"
+                data-testid="button-view-on-map"
                 onClick={() => setLocation("/explore")}
                 className="w-full rounded-md border border-border bg-card px-4 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               >
