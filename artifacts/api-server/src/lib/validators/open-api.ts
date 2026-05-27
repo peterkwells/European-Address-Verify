@@ -69,7 +69,6 @@ export async function validateFR(
 
   const f = data.features[0].properties;
   const score = f.score ?? 0;
-  const confidence = score >= 0.7 ? "high" : "medium";
 
   const normalised: NormalisedAddress = {
     house_number: f.housenumber ?? null,
@@ -81,12 +80,19 @@ export async function validateFR(
 
   const warnings: string[] = [];
   if (score < 0.7) {
-    warnings.push(`Low match score (${score.toFixed(2)}) — result may be approximate`);
+    warnings.push(
+      `Low geocode match score (${score.toFixed(2)}) — result is the nearest match and may be approximate`,
+    );
+  }
+  if (!input.street && !input.house_number) {
+    warnings.push(
+      "Only postcode was provided; result is the first matching address in this postcode area",
+    );
   }
 
   return {
     valid: true,
-    confidence,
+    confidence: "high",
     method: "open-api",
     source: "Base Adresse Nationale (BAN)",
     source_url: "https://api-adresse.data.gouv.fr",
@@ -156,12 +162,14 @@ export async function validateNL(
 
   const warnings: string[] = [];
   if (!input.street && !input.house_number) {
-    warnings.push("Only postcode was provided; result is the first matching address in this postcode area");
+    warnings.push(
+      "Only postcode was provided; result is the first matching address in this postcode area",
+    );
   }
 
   return {
     valid: true,
-    confidence: input.house_number ? "high" : "medium",
+    confidence: "high",
     method: "open-api",
     source: "PDOK Locatieserver (BAG)",
     source_url: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free",
@@ -235,13 +243,15 @@ export async function validateNO(
   };
 
   const warnings: string[] = [];
-  if (!input.street) {
-    warnings.push("Only postcode was provided; result is the first matching address in this postcode area");
+  if (!input.street && !input.house_number) {
+    warnings.push(
+      "Only postcode was provided; result is the first matching address in this postcode area",
+    );
   }
 
   return {
     valid: true,
-    confidence: input.house_number && input.street ? "high" : "medium",
+    confidence: "high",
     method: "open-api",
     source: "Kartverket National Address API",
     source_url: "https://ws.geonorge.no/adresser/v1/",
@@ -318,13 +328,15 @@ export async function validateDK(
   };
 
   const warnings: string[] = [];
-  if (!input.street) {
-    warnings.push("Only postcode was provided; result is the first matching address in this postcode area");
+  if (!input.street && !input.house_number) {
+    warnings.push(
+      "Only postcode was provided; result is the first matching address in this postcode area",
+    );
   }
 
   return {
     valid: true,
-    confidence: input.house_number && input.street ? "high" : "medium",
+    confidence: "high",
     method: "open-api",
     source: "DAWA — Danmarks Adresser Web API",
     source_url: "https://dawa.aws.dk",

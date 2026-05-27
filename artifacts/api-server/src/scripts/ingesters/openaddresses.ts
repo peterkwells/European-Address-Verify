@@ -5,23 +5,34 @@
  *   LON,LAT,NUMBER,STREET,UNIT,CITY,DISTRICT,REGION,POSTCODE,ID,HASH
  *
  * Files are ZIP archives containing one or more CSV files.
+ * Uses csv-parse for standards-compliant CSV parsing (handles quoted fields,
+ * escaped quotes, embedded commas, BOM, etc.).
  */
 
 import { createReadStream } from "node:fs";
-import { unlink, readdir } from "node:fs/promises";
+import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { createInterface } from "node:readline";
+import { parse } from "csv-parse";
 import { db } from "@workspace/db";
 import { addressesTable } from "@workspace/db";
 import {
   downloadFile,
   checkAlreadyIngested,
+  clearCountryData,
   recordIngestion,
   cleanup,
 } from "./base.js";
 
 const BATCH_SIZE = 5000;
+
+interface OARecord {
+  NUMBER?: string;
+  STREET?: string;
+  CITY?: string;
+  POSTCODE?: string;
+  [key: string]: string | undefined;
+}
 
 export async function ingestOpenAddresses(
   country_code: string,
@@ -34,32 +45,45 @@ export async function ingestOpenAddresses(
     return;
   }
 
-  const { Extract } = await import("unzip-stream");
+  await clearCountryData(country_code);
 
-  console.log(`  Parsing OpenAddresses data for ${country_code}...`);
-  let totalInserted = 0;
+  const { Extract } = await import("unzip-stream");
+  const extractDir = join(tmpdir(), `addr-${country_code}`);
 
   await new Promise<void>((resolve, reject) => {
     createReadStream(zipPath)
-      .pipe(Extract({ path: join(tmpdir(), `addr-${country_code}`) }))
+      .pipe(Extract({ path: extractDir }))
       .on("finish", resolve)
       .on("error", reject);
   });
 
-  const extractDir = join(tmpdir(), `addr-${country_code}`);
+  console.log(`  Parsing OpenAddresses data for ${country_code}...`);
+
   const files = (await readdir(extractDir, { recursive: true })).filter(
     (f) => typeof f === "string" && f.endsWith(".csv"),
   ) as string[];
 
+  let totalInserted = 0;
+
   for (const file of files) {
     const filePath = join(extractDir, file);
-    const rl = createInterface({
-      input: createReadStream(filePath),
-      crlfDelay: Infinity,
-    });
+    const parser = createReadStream(filePath).pipe(
+      parse({
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+        relax_column_count: true,
+        bom: true,
+        on_record: (record: Record<string, string>) => {
+          const normalised: OARecord = {};
+          for (const [k, v] of Object.entries(record)) {
+            normalised[k.toUpperCase()] = v;
+          }
+          return normalised;
+        },
+      }),
+    );
 
-    let isHeader = true;
-    let headerMap: Record<string, number> = {};
     const batch: Array<{
       country_code: string;
       postcode: string;
@@ -69,64 +93,40 @@ export async function ingestOpenAddresses(
       source_dataset: string;
     }> = [];
 
-    for await (const line of rl) {
-      if (isHeader) {
-        const cols = line.split(",").map((c) => c.toLowerCase().trim());
-        cols.forEach((col, i) => { headerMap[col] = i; });
-        isHeader = false;
-        continue;
-      }
-
-      const cols = parseCsvLine(line);
-      const postcode = cols[headerMap["postcode"] ?? 8]?.trim();
+    for await (const record of parser as AsyncIterable<OARecord>) {
+      const postcode = record["POSTCODE"]?.trim();
       if (!postcode) continue;
 
       batch.push({
         country_code,
         postcode,
-        city: cols[headerMap["city"] ?? 5]?.trim() || undefined,
-        street: cols[headerMap["street"] ?? 3]?.trim() || undefined,
-        house_number: cols[headerMap["number"] ?? 2]?.trim() || undefined,
+        city: record["CITY"]?.trim() || undefined,
+        street: record["STREET"]?.trim() || undefined,
+        house_number: record["NUMBER"]?.trim() || undefined,
         source_dataset: `OpenAddresses ${country_code}`,
       });
 
       if (batch.length >= BATCH_SIZE) {
-        await db.insert(addressesTable).values(batch).onConflictDoNothing();
+        await db.insert(addressesTable).values(batch);
         totalInserted += batch.length;
         batch.length = 0;
-        process.stdout.write(`\r  Inserted ${totalInserted.toLocaleString()} records...`);
+        process.stdout.write(
+          `\r  Inserted ${totalInserted.toLocaleString()} records...`,
+        );
       }
     }
 
     if (batch.length > 0) {
-      await db.insert(addressesTable).values(batch).onConflictDoNothing();
+      await db.insert(addressesTable).values(batch);
       totalInserted += batch.length;
     }
   }
 
   process.stdout.write("\n");
-  console.log(`  Inserted ${totalInserted.toLocaleString()} total records for ${country_code}.`);
+  console.log(
+    `  Inserted ${totalInserted.toLocaleString()} total records for ${country_code}.`,
+  );
 
   await recordIngestion(country_code, url, checksum, totalInserted);
   await cleanup(zipPath);
-}
-
-function parseCsvLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      inQuotes = !inQuotes;
-    } else if (ch === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  result.push(current);
-  return result;
 }

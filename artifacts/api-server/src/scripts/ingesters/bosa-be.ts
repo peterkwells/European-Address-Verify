@@ -12,19 +12,29 @@
 import { createReadStream } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { createInterface } from "node:readline";
 import { readdir } from "node:fs/promises";
+import { parse } from "csv-parse";
 import { db } from "@workspace/db";
 import { addressesTable } from "@workspace/db";
 import {
   downloadFile,
   checkAlreadyIngested,
+  clearCountryData,
   recordIngestion,
   cleanup,
 } from "./base.js";
 
 const BOSA_URL = "https://opendata.bosa.be/download/best/openaddress-bevaddress.zip";
 const BATCH_SIZE = 5000;
+
+interface BosaRecord {
+  house_number?: string;
+  postcode?: string;
+  municipality_name_nl?: string;
+  municipality_name_fr?: string;
+  municipality_name?: string;
+  [key: string]: string | undefined;
+}
 
 export async function ingestBosa(): Promise<void> {
   const { path: zipPath, checksum } = await downloadFile(BOSA_URL);
@@ -33,6 +43,8 @@ export async function ingestBosa(): Promise<void> {
     await cleanup(zipPath);
     return;
   }
+
+  await clearCountryData("BE");
 
   const { Extract } = await import("unzip-stream");
   const extractDir = join(tmpdir(), "addr-BE");
@@ -51,13 +63,16 @@ export async function ingestBosa(): Promise<void> {
   let totalInserted = 0;
 
   for (const file of files) {
-    const rl = createInterface({
-      input: createReadStream(join(extractDir, file)),
-      crlfDelay: Infinity,
-    });
+    const parser = createReadStream(join(extractDir, file)).pipe(
+      parse({
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+        relax_column_count: true,
+        bom: true,
+      }),
+    );
 
-    let isHeader = true;
-    let headerMap: Record<string, number> = {};
     const batch: Array<{
       country_code: string;
       postcode: string;
@@ -67,33 +82,25 @@ export async function ingestBosa(): Promise<void> {
       source_dataset: string;
     }> = [];
 
-    for await (const line of rl) {
-      if (isHeader) {
-        const cols = line.split(",").map((c) => c.toLowerCase().replace(/"/g, "").trim());
-        cols.forEach((col, i) => { headerMap[col] = i; });
-        isHeader = false;
-        continue;
-      }
-
-      const cols = line.split(",").map((c) => c.replace(/"/g, "").trim());
-      const postcode = cols[headerMap["postcode"] ?? 3];
+    for await (const record of parser as AsyncIterable<BosaRecord>) {
+      const postcode = record["postcode"];
       if (!postcode) continue;
 
       const municipality =
-        cols[headerMap["municipality_name_nl"]] ||
-        cols[headerMap["municipality_name_fr"]] ||
-        cols[headerMap["municipality_name"]];
+        record["municipality_name_nl"] ||
+        record["municipality_name_fr"] ||
+        record["municipality_name"];
 
       batch.push({
         country_code: "BE",
         postcode,
         city: municipality || undefined,
-        house_number: cols[headerMap["house_number"]] || undefined,
+        house_number: record["house_number"] || undefined,
         source_dataset: "BOSA opendata.bosa.be",
       });
 
       if (batch.length >= BATCH_SIZE) {
-        await db.insert(addressesTable).values(batch).onConflictDoNothing();
+        await db.insert(addressesTable).values(batch);
         totalInserted += batch.length;
         batch.length = 0;
         process.stdout.write(`\r  Inserted ${totalInserted.toLocaleString()} records...`);
@@ -101,7 +108,7 @@ export async function ingestBosa(): Promise<void> {
     }
 
     if (batch.length > 0) {
-      await db.insert(addressesTable).values(batch).onConflictDoNothing();
+      await db.insert(addressesTable).values(batch);
       totalInserted += batch.length;
     }
   }

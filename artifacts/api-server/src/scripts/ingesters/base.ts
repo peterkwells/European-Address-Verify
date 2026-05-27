@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { pipeline } from "node:stream/promises";
 import { createGunzip, createUnzip } from "node:zlib";
 import { db } from "@workspace/db";
-import { datasetIngestionsTable } from "@workspace/db";
+import { addressesTable, datasetIngestionsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 export interface ParsedAddress {
@@ -20,6 +20,11 @@ export interface IngestionOptions {
   country_code: string;
   source_url: string;
   source_dataset: string;
+}
+
+export async function clearCountryData(country_code: string): Promise<void> {
+  console.log(`  Clearing existing address data for ${country_code}...`);
+  await db.delete(addressesTable).where(eq(addressesTable.country_code, country_code));
 }
 
 export async function checkAlreadyIngested(
