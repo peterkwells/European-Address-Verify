@@ -1,0 +1,415 @@
+export type ValidationMethod =
+  | "open-api"
+  | "bulk-local"
+  | "format+reference"
+  | "format-only"
+  | "restricted";
+
+export type LegalRisk = "low" | "medium" | "high" | "very-high";
+export type Tier = 1 | 2 | 3;
+
+export interface CountryEntry {
+  country_code: string;
+  country_name: string;
+  tier: Tier;
+  validation_method: ValidationMethod;
+  validation_method_description: string;
+  data_source: string;
+  data_source_url: string;
+  licence: string;
+  licence_url: string | null;
+  cost: string;
+  cost_description: string;
+  legal_risk: LegalRisk;
+  legal_risk_notes: string;
+}
+
+export const REGISTRY: Record<string, CountryEntry> = {
+  FR: {
+    country_code: "FR",
+    country_name: "France",
+    tier: 1,
+    validation_method: "open-api",
+    validation_method_description:
+      "Address is looked up in real time against the Base Adresse Nationale (BAN), the official French national address database published by the government under an open licence. Returns normalised address and high-confidence result.",
+    data_source: "Base Adresse Nationale (BAN)",
+    data_source_url: "https://api-adresse.data.gouv.fr",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description:
+      "The BAN API is free to use with no registration required. The data is published under ODbL 1.0 by the French government.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Data is published under ODbL 1.0 by the Direction Interministérielle du Numérique (DINUM). Free redistribution and commercial use permitted with attribution and share-alike obligations.",
+  },
+
+  NL: {
+    country_code: "NL",
+    country_name: "Netherlands",
+    tier: 1,
+    validation_method: "open-api",
+    validation_method_description:
+      "Address is looked up in real time against the PDOK Locatieserver, which queries the BAG (Basisregistraties Adressen en Gebouwen) — the authoritative Dutch national address and buildings registry.",
+    data_source: "PDOK Locatieserver (BAG)",
+    data_source_url: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free",
+    licence: "CC0-1.0",
+    licence_url: "https://creativecommons.org/publicdomain/zero/1.0/",
+    cost: "Free",
+    cost_description:
+      "The PDOK Locatieserver is a free public API provided by the Dutch government. No API key or registration required.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "BAG data is published under CC0 1.0 by the Dutch government. No restrictions on use, redistribution, or commercial application.",
+  },
+
+  NO: {
+    country_code: "NO",
+    country_name: "Norway",
+    tier: 1,
+    validation_method: "open-api",
+    validation_method_description:
+      "Address is looked up in real time against the Kartverket national address API, Norway's authoritative national mapping authority.",
+    data_source: "Kartverket National Address API",
+    data_source_url: "https://ws.geonorge.no/adresser/v1/",
+    licence: "NLOD-2.0",
+    licence_url: "https://data.norge.no/nlod/en/2.0",
+    cost: "Free",
+    cost_description:
+      "Kartverket's APIs are free to use. Data is published under the Norwegian Licence for Open Government Data (NLOD 2.0).",
+    legal_risk: "low",
+    legal_risk_notes:
+      "NLOD 2.0 permits free use, redistribution, and commercial use with attribution. Maintained by the Norwegian Mapping Authority (Kartverket), a government agency.",
+  },
+
+  DK: {
+    country_code: "DK",
+    country_name: "Denmark",
+    tier: 1,
+    validation_method: "open-api",
+    validation_method_description:
+      "Address is looked up in real time against the Danish Address Web API (DAWA), operated by the Agency for Data Supply and Infrastructure.",
+    data_source: "DAWA — Danmarks Adresser Web API",
+    data_source_url: "https://api.datafordeler.dk",
+    licence: "Danish-OGDL",
+    licence_url: "https://www.retsinformation.dk/eli/lta/2016/746",
+    cost: "Free",
+    cost_description:
+      "DAWA is a free public API with no registration required for basic use.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Danish address data is published under the Danish Open Government Data Licence. Commercial use and redistribution are permitted with attribution.",
+  },
+
+  BE: {
+    country_code: "BE",
+    country_name: "Belgium",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested copy of the BOSA opendata.bosa.be dataset, the official Belgian federal address register published under CC0.",
+    data_source: "BOSA opendata.bosa.be (Best)",
+    data_source_url: "https://opendata.bosa.be",
+    licence: "CC0-1.0",
+    licence_url: "https://creativecommons.org/publicdomain/zero/1.0/",
+    cost: "Free",
+    cost_description:
+      "Data is free to download and use under CC0 from the Belgian federal government.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "CC0 1.0 — no copyright restrictions. Published by BOSA (Federal Public Service Policy and Support). Free for any use including commercial.",
+  },
+
+  AT: {
+    country_code: "AT",
+    country_name: "Austria",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested copy of the BEV Adressregister, the official Austrian national address register.",
+    data_source: "BEV Adressregister",
+    data_source_url:
+      "https://www.bev.gv.at/Portal/Page/Portal/BEV/Produkte/Adressen/Adressregister",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
+    cost: "Free",
+    cost_description:
+      "The BEV Adressregister is freely downloadable under CC BY 4.0.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "CC BY 4.0 — attribution required. Published by the Federal Office of Metrology and Surveying (BEV), an Austrian government agency. Commercial use permitted.",
+  },
+
+  DE: {
+    country_code: "DE",
+    country_name: "Germany",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from official German Länder open data sources.",
+    data_source: "OpenAddresses compiled (German Länder open data)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description:
+      "Data is free to download from OpenAddresses, which compiles it from official German open data sources.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from Länder open data sources (primarily dl-de/by-2-0 and CC BY 4.0) and aggregated by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+  },
+
+  IT: {
+    country_code: "IT",
+    country_name: "Italy",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Italian municipal open data sources.",
+    data_source: "OpenAddresses compiled (Italian municipal open data)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from Italian open data sources (CC BY 4.0 and IODL 2.0 licensed municipal datasets) by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+  },
+
+  ES: {
+    country_code: "ES",
+    country_name: "Spain",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from the Spanish Catastro and municipal open data.",
+    data_source: "OpenAddresses compiled (Catastro + Spanish open data)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from the Catastro (Spanish cadastre, open data) and municipal open datasets by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+  },
+
+  PT: {
+    country_code: "PT",
+    country_name: "Portugal",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Portuguese open data sources.",
+    data_source: "OpenAddresses compiled (Portuguese open data)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from Portuguese open government data under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+  },
+
+  SE: {
+    country_code: "SE",
+    country_name: "Sweden",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Lantmäteriet and municipal open data.",
+    data_source: "OpenAddresses compiled (Lantmäteriet open data)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from Lantmäteriet open data (CC0 and CC BY licence) under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+  },
+
+  FI: {
+    country_code: "FI",
+    country_name: "Finland",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from the National Land Survey of Finland open data.",
+    data_source: "OpenAddresses compiled (National Land Survey of Finland)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from National Land Survey of Finland open data (CC BY 4.0) under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+  },
+
+  PL: {
+    country_code: "PL",
+    country_name: "Poland",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Polish government open data (GUS/PRG).",
+    data_source: "OpenAddresses compiled (PRG — Polish Address Register)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from PRG (Polish Address Register), published by GUS under an open government licence, aggregated by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+  },
+
+  CZ: {
+    country_code: "CZ",
+    country_name: "Czech Republic",
+    tier: 2,
+    validation_method: "bulk-local",
+    validation_method_description:
+      "Address is validated against a locally ingested dataset compiled by OpenAddresses from ČÚZK (Czech Office for Surveying, Mapping and Cadastre) open data.",
+    data_source: "OpenAddresses compiled (ČÚZK open data)",
+    data_source_url: "https://openaddresses.io",
+    licence: "ODbL-1.0",
+    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+    cost: "Free",
+    cost_description: "Free to download from OpenAddresses.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Compiled from ČÚZK open data (CC BY 4.0) under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+  },
+
+  IE: {
+    country_code: "IE",
+    country_name: "Ireland",
+    tier: 2,
+    validation_method: "format+reference",
+    validation_method_description:
+      "Eircode format is validated by regex and cross-checked against a postcode reference table. The authoritative Eircode database is commercially licensed and not available under an open licence.",
+    data_source: "postcode-validator (format) + open reference data",
+    data_source_url: "https://www.npmjs.com/package/postcode-validator",
+    licence: "MIT",
+    licence_url: "https://opensource.org/licenses/MIT",
+    cost: "Free (format check) / €commercial (full Eircode database)",
+    cost_description:
+      "Format-only validation is free using open-source libraries. The full authoritative Eircode database requires a commercial licence from An Post.",
+    legal_risk: "medium",
+    legal_risk_notes:
+      "Eircode postcode system is managed by Capita Business Support on behalf of the Irish government. The full ECAD (Eircode Address Database) is commercially licensed. Format-only validation carries no licensing risk, but the check is shallow. Full address validation requires purchasing access to ECAD.",
+  },
+
+  CH: {
+    country_code: "CH",
+    country_name: "Switzerland",
+    tier: 2,
+    validation_method: "format+reference",
+    validation_method_description:
+      "Swiss postcode format is validated by regex and cross-checked against Swiss Post's publicly available postcode list.",
+    data_source: "Swiss Post postcode list + postcode-validator",
+    data_source_url: "https://www.post.ch/en/business/a-z-of-subjects/address-management-data/swiss-zip-code-directory",
+    licence: "Swiss-Post-Terms",
+    licence_url: null,
+    cost: "Free (format/postcode check)",
+    cost_description:
+      "Format and postcode validation is free. The Swiss Post postcode list is publicly available for reference use.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Swiss Post publishes its postcode directory for public reference use. Postcode format validation has minimal legal risk. For full authoritative address validation, swisstopo publishes Swiss address data under an open government data licence.",
+  },
+
+  LU: {
+    country_code: "LU",
+    country_name: "Luxembourg",
+    tier: 2,
+    validation_method: "format+reference",
+    validation_method_description:
+      "Luxembourg postcode format is validated by regex. Luxembourg uses a 4-digit numeric postcode system.",
+    data_source: "postcode-validator",
+    data_source_url: "https://www.npmjs.com/package/postcode-validator",
+    licence: "MIT",
+    licence_url: "https://opensource.org/licenses/MIT",
+    cost: "Free",
+    cost_description: "Format validation only, using open-source libraries.",
+    legal_risk: "low",
+    legal_risk_notes:
+      "Luxembourg's ACT (Administration du Cadastre et de la Topographie) publishes some open geodata. Format-only validation carries no licensing risk.",
+  },
+
+  HU: {
+    country_code: "HU",
+    country_name: "Hungary",
+    tier: 2,
+    validation_method: "format-only",
+    validation_method_description:
+      "Hungarian postcode format is validated by regex only (4-digit numeric). No openly licensed authoritative address dataset is currently available.",
+    data_source: "postcode-validator",
+    data_source_url: "https://www.npmjs.com/package/postcode-validator",
+    licence: "MIT",
+    licence_url: "https://opensource.org/licenses/MIT",
+    cost: "Free (format check only)",
+    cost_description: "Format validation only, using open-source libraries.",
+    legal_risk: "medium",
+    legal_risk_notes:
+      "No fully open national address dataset is available for Hungary. The FÖMI (Institute of Geodesy, Cartography and Remote Sensing) manages address data under restricted terms. Format-only validation carries no risk but provides low confidence.",
+  },
+
+  RO: {
+    country_code: "RO",
+    country_name: "Romania",
+    tier: 2,
+    validation_method: "format-only",
+    validation_method_description:
+      "Romanian postcode format is validated by regex only (6-digit numeric). No openly licensed authoritative address dataset is currently available.",
+    data_source: "postcode-validator",
+    data_source_url: "https://www.npmjs.com/package/postcode-validator",
+    licence: "MIT",
+    licence_url: "https://opensource.org/licenses/MIT",
+    cost: "Free (format check only)",
+    cost_description: "Format validation only, using open-source libraries.",
+    legal_risk: "medium",
+    legal_risk_notes:
+      "No openly licensed national address dataset is available for Romania. ANCPI (National Agency for Cadastre and Land Registration) manages address data under restricted terms. Format-only validation carries no risk but provides low confidence.",
+  },
+
+  GB: {
+    country_code: "GB",
+    country_name: "United Kingdom",
+    tier: 3,
+    validation_method: "restricted",
+    validation_method_description:
+      "Authoritative UK address data is not freely available. The Royal Mail Postcode Address File (PAF) and Ordnance Survey AddressBase products are commercially licensed. This API does not attempt validation and returns a clear explanation.",
+    data_source: "Royal Mail PAF / OS AddressBase (commercial)",
+    data_source_url: "https://www.royalmail.com/business/data/postcode-address-file",
+    licence: "Commercial",
+    licence_url: null,
+    cost: "Commercial licensing required — typically £thousands per year",
+    cost_description:
+      "Royal Mail PAF licences start at several thousand pounds per year for basic use and scale significantly with volume and application type. OS AddressBase (which includes UPRN — Unique Property Reference Numbers) is licensed through the Public Sector Mapping Agreement (PSMA) for public sector bodies, but commercial use requires separate negotiation with Ordnance Survey. Costs for commercial licensees can reach tens of thousands of pounds annually.",
+    legal_risk: "very-high",
+    legal_risk_notes:
+      "UK address data is subject to multiple overlapping commercial licences and legal restrictions:\n\n" +
+      "1. **Royal Mail Postcode Address File (PAF)**: PAF is the most complete UK address database. It is commercially licensed by Royal Mail and use without a licence is a breach of copyright. Licences are tiered by use case and volume; many applications requiring real-time lookup require a 'Class 1' licence. Unlicensed use — including scraping, copying, or redistributing postcodes — has been subject to legal action.\n\n" +
+      "2. **Ordnance Survey AddressBase / UPRN**: The Unique Property Reference Number (UPRN) is the definitive identifier for UK properties, maintained by local authorities and aggregated by Ordnance Survey. AddressBase Premium (which includes UPRNs) is available free to public sector bodies through PSMA, but commercial use requires direct licensing from Ordnance Survey. Re-publishing UPRNs without a licence is a known legal risk.\n\n" +
+      "3. **GeoPlace**: The Local Land and Property Gazetteer (LLPG) data that feeds AddressBase is maintained by local authorities and licensed through GeoPlace LLP, a joint venture between the Local Government Association and Ordnance Survey.\n\n" +
+      "4. **No open alternative**: Unlike France, Germany, the Netherlands, and most of continental Europe, the UK has no government-published open licence address dataset suitable for general application use. The Open Names dataset from OS is limited to place names, not full property addresses.\n\n" +
+      "5. **Contrast with Europe**: Most EU member states publish authoritative national address data under open licences (CC0, CC BY, ODbL) as a matter of policy. The UK's approach significantly increases the cost and legal complexity of building address-dependent services.",
+  },
+};
+
+export function getCountry(code: string): CountryEntry | undefined {
+  return REGISTRY[code.toUpperCase()];
+}
+
+export function getAllCountries(): CountryEntry[] {
+  return Object.values(REGISTRY);
+}
+
+export function getCountriesByTier(tier: Tier): CountryEntry[] {
+  return Object.values(REGISTRY).filter((c) => c.tier === tier);
+}

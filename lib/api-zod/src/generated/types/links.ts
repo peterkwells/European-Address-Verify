@@ -8,7 +8,9 @@ GDS API technical and data standards.
 
  * OpenAPI spec version: 1.0.0
  */
+import type { Link } from './link';
 
-export interface HealthStatus {
-  status: string;
+export interface Links {
+  self: Link;
+  [key: string]: Link;
 }

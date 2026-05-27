@@ -8,7 +8,13 @@ GDS API technical and data standards.
 
  * OpenAPI spec version: 1.0.0
  */
+import type { ApiErrorErrorsItem } from './apiErrorErrorsItem';
 
-export interface HealthStatus {
-  status: string;
+export interface ApiError {
+  status_code: number;
+  /** Short machine-readable error type */
+  error: string;
+  /** Human-readable description of the error */
+  message: string;
+  errors?: ApiErrorErrorsItem[];
 }

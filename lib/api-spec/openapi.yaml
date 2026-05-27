@@ -2,14 +2,23 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 1.0.0
+  description: |
+    European Address Validation API. Validates addresses across European countries
+    using openly licensed, authoritative data sources. Built in accordance with
+    GDS API technical and data standards.
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: addresses
+    description: Address validation
+  - name: coverage
+    description: Country coverage and data source metadata
+  - name: meta
+    description: API metadata
 paths:
   /healthz:
     get:
@@ -24,6 +33,159 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /v1:
+    get:
+      operationId: getApiMeta
+      tags: [meta]
+      summary: API metadata
+      description: Returns API version, documentation URL, coverage statistics, and ingestion status for bulk-local countries.
+      responses:
+        "200":
+          description: API metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiMeta"
+
+  /v1/addresses/validate:
+    get:
+      operationId: validateAddress
+      tags: [addresses]
+      summary: Validate a European address
+      description: |
+        Validates an address for the given country. Validation depth depends on
+        the country's tier: Tier 1 countries query a live authoritative API in
+        real time; Tier 2 countries check against a locally stored dataset or
+        postcode reference; Tier 3 countries (GB) are restricted and return
+        `valid: null` with an explanation.
+
+        The `method` field in the response always describes how the address was
+        validated. The `confidence` field reflects the depth of the check.
+      parameters:
+        - name: country
+          in: query
+          required: true
+          description: ISO 3166-1 alpha-2 country code (e.g. FR, DE, NL)
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            pattern: "^[A-Z]{2}$"
+        - name: postcode
+          in: query
+          required: true
+          description: Postcode / postal code
+          schema:
+            type: string
+        - name: city
+          in: query
+          required: false
+          description: City or town name
+          schema:
+            type: string
+        - name: street
+          in: query
+          required: false
+          description: Street name
+          schema:
+            type: string
+        - name: house_number
+          in: query
+          required: false
+          description: House or building number
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Validation result
+          headers:
+            X-Data-Source:
+              description: Name of the authoritative data source used
+              schema:
+                type: string
+            X-Licence:
+              description: SPDX licence identifier of the data source
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+        "400":
+          description: Missing or invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Country not supported
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "422":
+          description: Address is syntactically unprocessable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "502":
+          description: Upstream authoritative API is unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Local dataset not yet ingested
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /v1/coverage:
+    get:
+      operationId: listCoverage
+      tags: [coverage]
+      summary: List country coverage
+      description: Returns all supported countries with their validation tier, data source, licence, and legal risk rating.
+      responses:
+        "200":
+          description: Coverage list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoverageList"
+
+  /v1/coverage/{country_code}:
+    get:
+      operationId: getCoverage
+      tags: [coverage]
+      summary: Get country coverage detail
+      description: Returns full coverage detail for a single country including source URL, licence, cost, legal risk notes, and ingestion status.
+      parameters:
+        - name: country_code
+          in: path
+          required: true
+          description: ISO 3166-1 alpha-2 country code
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+      responses:
+        "200":
+          description: Country coverage detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CountryCoverageDetail"
+        "404":
+          description: Country not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +196,261 @@ components:
       required:
         - status
 
+    ApiMeta:
+      type: object
+      properties:
+        version:
+          type: string
+          description: API version
+        description:
+          type: string
+        documentation_url:
+          type: string
+        country_count:
+          type: integer
+          description: Number of supported countries
+        tier_1_count:
+          type: integer
+          description: Countries with live authoritative API validation
+        tier_2_count:
+          type: integer
+          description: Countries with bulk-local or format-reference validation
+        tier_3_count:
+          type: integer
+          description: Countries with restricted data (no validation)
+        _links:
+          $ref: "#/components/schemas/Links"
+      required:
+        - version
+        - description
+        - documentation_url
+        - country_count
+        - tier_1_count
+        - tier_2_count
+        - tier_3_count
+        - _links
+
+    NormalisedAddress:
+      type: object
+      properties:
+        house_number:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        country_code:
+          type: string
+      required:
+        - country_code
+
+    ValidationResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          nullable: true
+          description: |
+            true = address confirmed valid; false = address confirmed invalid;
+            null = cannot determine (restricted country or dataset not ingested)
+        confidence:
+          type: string
+          enum: [high, medium, low, unknown]
+          description: |
+            high = full address matched against authoritative source;
+            medium = postcode+city matched; low = postcode format only;
+            unknown = restricted or unavailable
+        method:
+          type: string
+          enum: [open-api, bulk-local, format+reference, format-only, restricted]
+          description: How the address was validated
+        source:
+          type: string
+          description: Name of the authoritative data source
+        source_url:
+          type: string
+          description: URL of the authoritative data source
+        licence:
+          type: string
+          description: SPDX licence identifier of the source data
+        normalised_address:
+          $ref: "#/components/schemas/NormalisedAddress"
+          nullable: true
+        warnings:
+          type: array
+          items:
+            type: string
+          description: Non-fatal issues or caveats about this validation result
+        _links:
+          $ref: "#/components/schemas/Links"
+      required:
+        - valid
+        - confidence
+        - method
+        - source
+        - source_url
+        - licence
+        - warnings
+        - _links
+
+    CountryCoverage:
+      type: object
+      properties:
+        country_code:
+          type: string
+        country_name:
+          type: string
+        tier:
+          type: integer
+          enum: [1, 2, 3]
+          description: "1=live API, 2=local dataset or format check, 3=restricted"
+        validation_method:
+          type: string
+          enum: [open-api, bulk-local, format+reference, format-only, restricted]
+        data_source:
+          type: string
+        licence:
+          type: string
+        cost:
+          type: string
+        legal_risk:
+          type: string
+          enum: [low, medium, high, very-high]
+        _links:
+          $ref: "#/components/schemas/Links"
+      required:
+        - country_code
+        - country_name
+        - tier
+        - validation_method
+        - data_source
+        - licence
+        - cost
+        - legal_risk
+        - _links
+
+    CountryCoverageDetail:
+      type: object
+      properties:
+        country_code:
+          type: string
+        country_name:
+          type: string
+        tier:
+          type: integer
+          enum: [1, 2, 3]
+        validation_method:
+          type: string
+          enum: [open-api, bulk-local, format+reference, format-only, restricted]
+        validation_method_description:
+          type: string
+        data_source:
+          type: string
+        data_source_url:
+          type: string
+        licence:
+          type: string
+        licence_url:
+          type: string
+          nullable: true
+        cost:
+          type: string
+        cost_description:
+          type: string
+        legal_risk:
+          type: string
+          enum: [low, medium, high, very-high]
+        legal_risk_notes:
+          type: string
+        ingestion_status:
+          type: string
+          enum: [live, ingested, not_ingested, not_applicable]
+          nullable: true
+        ingestion_last_loaded_at:
+          type: string
+          format: date-time
+          nullable: true
+        _links:
+          $ref: "#/components/schemas/Links"
+      required:
+        - country_code
+        - country_name
+        - tier
+        - validation_method
+        - validation_method_description
+        - data_source
+        - data_source_url
+        - licence
+        - cost
+        - cost_description
+        - legal_risk
+        - legal_risk_notes
+        - _links
+
+    CoverageList:
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryCoverage"
+        count:
+          type: integer
+        _links:
+          $ref: "#/components/schemas/Links"
+      required:
+        - countries
+        - count
+        - _links
+
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+      required:
+        - href
+
+    Links:
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/Link"
+      required:
+        - self
+      additionalProperties:
+        $ref: "#/components/schemas/Link"
+
+    ApiError:
+      type: object
+      properties:
+        status_code:
+          type: integer
+        error:
+          type: string
+          description: Short machine-readable error type
+        message:
+          type: string
+          description: Human-readable description of the error
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+            required:
+              - field
+              - message
+      required:
+        - status_code
+        - error
+        - message

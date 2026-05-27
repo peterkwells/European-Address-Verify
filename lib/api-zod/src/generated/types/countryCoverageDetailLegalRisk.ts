@@ -9,6 +9,12 @@ GDS API technical and data standards.
  * OpenAPI spec version: 1.0.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+export type CountryCoverageDetailLegalRisk = typeof CountryCoverageDetailLegalRisk[keyof typeof CountryCoverageDetailLegalRisk];
+
+
+export const CountryCoverageDetailLegalRisk = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  'very-high': 'very-high',
+} as const;

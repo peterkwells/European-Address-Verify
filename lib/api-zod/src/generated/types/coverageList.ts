@@ -8,7 +8,11 @@ GDS API technical and data standards.
 
  * OpenAPI spec version: 1.0.0
  */
+import type { CountryCoverage } from './countryCoverage';
+import type { Links } from './links';
 
-export interface HealthStatus {
-  status: string;
+export interface CoverageList {
+  countries: CountryCoverage[];
+  count: number;
+  _links: Links;
 }
