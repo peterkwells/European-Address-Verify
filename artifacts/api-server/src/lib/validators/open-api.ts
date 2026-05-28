@@ -122,9 +122,17 @@ export async function validateFR(
     );
   }
 
+  let confidence: "high" | "medium" = "high";
+  if (input.house_number && !normalised.house_number) {
+    confidence = "medium";
+    warnings.push(
+      "House number was provided but could not be confirmed in the authoritative source — result is the nearest matching address",
+    );
+  }
+
   return {
     valid: true,
-    confidence: "high",
+    confidence,
     method: "open-api",
     source: "Base Adresse Nationale (BAN)",
     source_url: "https://api-adresse.data.gouv.fr",
@@ -198,7 +206,7 @@ export async function validateNL(
   const doc = data.response.docs[0];
 
   const normalised: NormalisedAddress = {
-    house_number: doc.huisnummer ?? null,
+    house_number: doc.huisnummer != null ? String(doc.huisnummer) : null,
     street: doc.straatnaam ?? null,
     city: doc.woonplaatsnaam ?? null,
     postcode: doc.postcode ?? null,
@@ -212,9 +220,24 @@ export async function validateNL(
     );
   }
 
+  let confidence: "high" | "medium" = "high";
+  if (input.house_number) {
+    if (!normalised.house_number) {
+      confidence = "medium";
+      warnings.push(
+        "House number was provided but could not be confirmed in the authoritative source — result is the nearest matching address",
+      );
+    } else if (String(input.house_number) !== String(normalised.house_number)) {
+      confidence = "medium";
+      warnings.push(
+        `Requested house number '${input.house_number}' did not match — nearest result returned house number '${normalised.house_number}'`,
+      );
+    }
+  }
+
   return {
     valid: true,
-    confidence: "high",
+    confidence,
     method: "open-api",
     source: "PDOK Locatieserver (BAG)",
     source_url: "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free",
