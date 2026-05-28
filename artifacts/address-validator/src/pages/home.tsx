@@ -73,13 +73,13 @@ export default function Home() {
       <div className="mb-8 max-w-3xl">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
           <Zap className="h-3 w-3 text-primary" />
-          <span>20 countries · zero cost · openly licensed</span>
+          <span>20 countries · as zero cost and openly licensed as possible</span>
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl" data-testid="heading-hero">
           European Address Validation
         </h1>
         <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-          A GDS-compliant REST API for validating full addresses across 20 European countries using
+          A REST API for validating full addresses across 20 European countries using
           authoritative, openly licensed data sources. Most of Europe is free and low-risk.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">

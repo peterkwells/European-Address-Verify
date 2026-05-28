@@ -56,7 +56,7 @@ router.get("/", async (_req: Request, res: Response): Promise<void> => {
   res.json({
     version: "1.0.0",
     description:
-      "European Address Validation API. Validates addresses across European countries using openly licensed, authoritative data sources. Built in accordance with GDS API technical and data standards.",
+      "European Address Validation API. Validates addresses across European countries using openly licensed, authoritative data sources. Built in accordance with GDS API technical and data standards (https://www.gov.uk/guidance/gds-api-technical-and-data-standards).",
     documentation_url: "/api/v1/coverage",
     country_count: all.length,
     tier_1_count: tier1.length,
