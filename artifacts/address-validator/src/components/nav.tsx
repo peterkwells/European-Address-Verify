@@ -33,8 +33,8 @@ export function Nav() {
           <div className="flex items-center gap-8">
             <Link href="/" data-testid="link-logo">
               <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-primary text-primary-foreground text-xs font-bold">
-                  EU
+                <span className="inline-flex h-7 items-center justify-center rounded bg-primary px-1.5 text-primary-foreground text-xs font-bold tracking-tight">
+                  European
                 </span>
                 <span className="hidden sm:inline">Address Validator</span>
                 <span className="hidden sm:inline-flex items-center rounded-full border border-amber-400/50 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-500/40">
