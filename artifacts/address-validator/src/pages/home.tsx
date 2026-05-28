@@ -1,6 +1,11 @@
 import { Link } from "wouter";
+import { Suspense, lazy } from "react";
 import { useGetApiMeta } from "@workspace/api-client-react";
-import { ArrowRight, CheckCircle2, AlertTriangle, XCircle, Zap, Database, Globe2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertTriangle, XCircle, Zap, Database, Globe2, Loader2 } from "lucide-react";
+
+const CoverageMap = lazy(() =>
+  import("@/components/CoverageMap").then((m) => ({ default: m.CoverageMap }))
+);
 
 const TIERS = [
   {
@@ -50,22 +55,32 @@ function StatCard({ label, value, sub }: { label: string; value: number | undefi
   );
 }
 
+function MapFallback() {
+  return (
+    <div className="flex h-[480px] items-center justify-center rounded-lg border border-border bg-muted/30">
+      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
 export default function Home() {
   const { data: meta } = useGetApiMeta();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-12 max-w-3xl">
+
+      {/* ── Hero ── */}
+      <div className="mb-8 max-w-3xl">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
           <Zap className="h-3 w-3 text-primary" />
-          <span>Built with AI on Replit — 20 countries, zero cost</span>
+          <span>20 countries · zero cost · openly licensed</span>
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl" data-testid="heading-hero">
           European Address Validation
         </h1>
         <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-          A GDS-compliant REST API for validating addresses across 20 European countries using
-          openly licensed, authoritative data sources. Most of Europe is free and low-risk.
+          A GDS-compliant REST API for validating full addresses across 20 European countries using
+          authoritative, openly licensed data sources. Most of Europe is free and low-risk.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/try" data-testid="link-cta-try">
@@ -76,19 +91,34 @@ export default function Home() {
           </Link>
           <Link href="/coverage" data-testid="link-cta-coverage">
             <span className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-              View Coverage
+              View Coverage Table
             </span>
           </Link>
         </div>
       </div>
 
-      <div className="mb-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {/* ── Stats ── */}
+      <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard label="Countries" value={meta?.country_count} sub="across Europe" />
-        <StatCard label="Tier 1" value={meta?.tier_1_count} sub="live API" />
-        <StatCard label="Tier 2" value={meta?.tier_2_count} sub="local dataset" />
-        <StatCard label="Tier 3" value={meta?.tier_3_count} sub="restricted" />
+        <StatCard label="Tier 1"    value={meta?.tier_1_count}  sub="live API" />
+        <StatCard label="Tier 2"    value={meta?.tier_2_count}  sub="local dataset" />
+        <StatCard label="Tier 3"    value={meta?.tier_3_count}  sub="restricted" />
       </div>
 
+      {/* ── Coverage Map ── */}
+      <div className="mb-12">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">Coverage Map</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Click any country to see validation method, cost, legal risk, and to try the API live.
+          </p>
+        </div>
+        <Suspense fallback={<MapFallback />}>
+          <CoverageMap />
+        </Suspense>
+      </div>
+
+      {/* ── Tier cards ── */}
       <div className="mb-10">
         <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Validation Tiers</h2>
         <p className="mb-6 text-sm text-muted-foreground">
@@ -96,16 +126,10 @@ export default function Home() {
         </p>
         <div className="grid gap-4 md:grid-cols-3">
           {TIERS.map(({ tier, label, description, color, badge, icon: Icon, iconColor, cost, risk }) => (
-            <div
-              key={tier}
-              className={`rounded-lg border p-5 ${color}`}
-              data-testid={`card-tier-${tier}`}
-            >
+            <div key={tier} className={`rounded-lg border p-5 ${color}`} data-testid={`card-tier-${tier}`}>
               <div className="mb-3 flex items-start justify-between">
                 <Icon className={`h-5 w-5 ${iconColor}`} />
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badge}`}>
-                  Tier {tier}
-                </span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badge}`}>Tier {tier}</span>
               </div>
               <h3 className="mb-1.5 text-sm font-semibold text-foreground">{label}</h3>
               <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{description}</p>
@@ -124,7 +148,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-red-200 bg-red-50 p-5 dark:border-red-900 dark:bg-red-950/30" data-testid="banner-gb-warning">
+      {/* ── GB warning ── */}
+      <div className="rounded-lg border border-red-200 bg-red-50 p-5 dark:border-red-900 dark:bg-red-950/30 mb-12" data-testid="banner-gb-warning">
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
           <div>
@@ -142,7 +167,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mt-12 border-t border-border pt-8">
+      {/* ── Quick start ── */}
+      <div className="border-t border-border pt-8">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Quick Start</h2>
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
@@ -150,7 +176,7 @@ export default function Home() {
             <span className="text-xs font-medium text-muted-foreground">Example — Validate a French address</span>
           </div>
           <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-foreground" data-testid="code-quickstart">
-            <code>{`GET /api/v1/addresses/validate?country=FR&postcode=75001&city=Paris
+            <code>{`GET /api/v1/addresses/validate?country=FR&postcode=75001&street=Rue+de+Rivoli&house_number=12
 
 {
   "valid": true,
@@ -161,6 +187,8 @@ export default function Home() {
   "normalised_address": {
     "postcode": "75001",
     "city": "Paris",
+    "street": "Rue de Rivoli",
+    "house_number": "12",
     "country_code": "FR"
   },
   "warnings": []
@@ -170,13 +198,7 @@ export default function Home() {
         {meta && (
           <p className="mt-3 text-xs text-muted-foreground">
             API v{meta.version} &mdash;{" "}
-            <a
-              href={meta.documentation_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-              data-testid="link-docs"
-            >
+            <a href={meta.documentation_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" data-testid="link-docs">
               Documentation
             </a>
           </p>

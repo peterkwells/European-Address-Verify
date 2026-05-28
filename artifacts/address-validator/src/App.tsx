@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,7 +7,6 @@ import { Nav } from "@/components/nav";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 
-const Explore = lazy(() => import("@/pages/explore"));
 const Try = lazy(() => import("@/pages/try"));
 const Coverage = lazy(() => import("@/pages/coverage"));
 
@@ -32,10 +31,12 @@ function Router() {
   return (
     <Suspense fallback={<PageFallback />}>
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/explore" component={Explore} />
-        <Route path="/try" component={Try} />
-        <Route path="/coverage" component={Coverage} />
+        <Route path="/"          component={Home} />
+        <Route path="/try"       component={Try} />
+        <Route path="/coverage"  component={Coverage} />
+        <Route path="/explore">
+          <Redirect to="/" />
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </Suspense>

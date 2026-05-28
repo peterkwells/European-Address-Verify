@@ -1,20 +1,21 @@
 import { Link, useLocation } from "wouter";
-import { Globe, Map, Terminal, Table2, Moon, Sun } from "lucide-react";
+import { Globe, Terminal, Table2, Moon, Sun } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navLinks = [
-  { href: "/", label: "Home", icon: Globe },
-  { href: "/explore", label: "Explore", icon: Map },
-  { href: "/try", label: "Try API", icon: Terminal },
-  { href: "/coverage", label: "Coverage", icon: Table2 },
+  { href: "/",        label: "Home",     icon: Globe },
+  { href: "/try",     label: "Try API",  icon: Terminal },
+  { href: "/coverage",label: "Coverage", icon: Table2 },
 ];
 
 export function Nav() {
   const [location] = useLocation();
   const [dark, setDark] = useState(() => {
     if (typeof window === "undefined") return false;
-    return document.documentElement.classList.contains("dark") ||
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return (
+      document.documentElement.classList.contains("dark") ||
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    );
   });
 
   useEffect(() => {
@@ -32,7 +33,9 @@ export function Nav() {
           <div className="flex items-center gap-8">
             <Link href="/" data-testid="link-logo">
               <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-primary text-primary-foreground text-xs font-bold">EU</span>
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-primary text-primary-foreground text-xs font-bold">
+                  EU
+                </span>
                 <span className="hidden sm:inline">Address Validator</span>
               </span>
             </Link>
