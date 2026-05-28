@@ -348,6 +348,7 @@ export async function validateDK(
   }
 
   if (!resp.ok) {
+    recordFailure(key);
     const dawaParams = new URLSearchParams({ postnr: input.postcode, per_side: "1" });
     if (input.street) dawaParams.set("vejnavn", input.street);
     if (input.house_number) dawaParams.set("husnr", input.house_number);

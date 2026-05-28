@@ -5,6 +5,14 @@ import type { AddressInput, ValidationResult } from "./types.js";
 import { DatasetNotIngestedError } from "./types.js";
 import { getCountry } from "../coverage-registry.js";
 
+function normaliseCity(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 export async function validateBulkLocal(
   input: AddressInput,
 ): Promise<ValidationResult> {
@@ -26,19 +34,24 @@ export async function validateBulkLocal(
     eq(addressesTable.postcode, normalisePostcode(input.postcode, countryUpper)),
   ];
 
-  if (input.city) {
-    conditions.push(ilike(addressesTable.city, input.city));
-  }
-
   if (input.street) {
     conditions.push(ilike(addressesTable.street, `%${input.street}%`));
   }
 
-  const matches = await db
+  const rawMatches = await db
     .select()
     .from(addressesTable)
     .where(and(...conditions))
-    .limit(5);
+    .limit(20);
+
+  const matches = input.city
+    ? rawMatches.filter(
+        (m) =>
+          !m.city ||
+          normaliseCity(m.city).includes(normaliseCity(input.city!)) ||
+          normaliseCity(input.city!).includes(normaliseCity(m.city)),
+      )
+    : rawMatches.slice(0, 5);
 
   const warnings: string[] = [];
 
