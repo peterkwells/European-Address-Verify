@@ -202,22 +202,14 @@ export default function Explore() {
 
     const controller = new AbortController();
     setGeoLoading(true);
-    const supported = new Set(coverageData.countries.map((c) => c.country_code));
-    fetch(
-      "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson",
-      { signal: controller.signal }
-    )
-      .then((r) => r.json())
-      .then((data: GeoJsonData) => {
+    fetch(`${import.meta.env.BASE_URL}europe-coverage.geojson`, { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<GeoJsonData>;
+      })
+      .then((data) => {
         if (!controller.signal.aborted) {
-          const filtered: GeoJsonData = {
-            ...data,
-            features: data.features.filter((f) => {
-              const iso = f.properties?.ISO_A2;
-              return iso && supported.has(iso);
-            }),
-          };
-          setGeoJson(filtered);
+          setGeoJson(data);
           setGeoLoading(false);
         }
       })
