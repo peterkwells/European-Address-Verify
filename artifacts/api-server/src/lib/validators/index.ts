@@ -37,7 +37,7 @@ export async function validate(input: AddressInput): Promise<ValidationResult> {
         licence: entry.licence,
         normalised_address: null,
         warnings: [
-          `Address data for ${entry.country_name} is legally restricted — validation is not available. See /api/v1/coverage/${entry.country_code} for details.`,
+          `Address data for ${entry.country_name} is commercially and legally restricted — validation is not available. See /api/v1/coverage/${entry.country_code} for details.`,
           `For authoritative ${entry.country_name} address validation, see: ${entry.data_source_url}`,
         ],
       };
