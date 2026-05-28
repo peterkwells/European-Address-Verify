@@ -157,11 +157,9 @@ export default function Home() {
               United Kingdom (GB) — Very High Legal Risk
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-red-700 dark:text-red-300">
-              Royal Mail holds a commercial monopoly on UK postcode data (PAF). Unlicensed use
-              carries significant legal risk and commercial licences are expensive. This API returns{" "}
+              UK address data is commercially locked by two overlapping monopolies. Royal Mail licenses the Postcode Address File (PAF) — the definitive record of postal addresses — and Ordnance Survey licenses AddressBase, which links property identifiers (UPRNs) to full address attributes. Both are required for a complete address service; neither is freely available for anyone to use. This API returns{" "}
               <code className="rounded bg-red-200/60 px-1 font-mono text-xs dark:bg-red-900/60">valid: null</code>{" "}
-              for GB addresses. We strongly recommend evaluating a licensed PAF provider for production use
-              in the United Kingdom.
+              for GB addresses. We strongly recommend evaluating licensed PAF and AddressBase providers before building any production address service for the United Kingdom.
             </p>
           </div>
         </div>
