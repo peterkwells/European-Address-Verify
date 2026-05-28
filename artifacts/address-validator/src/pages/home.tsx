@@ -1,7 +1,7 @@
 import { Link } from "wouter";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 import { useGetApiMeta } from "@workspace/api-client-react";
-import { ArrowRight, CheckCircle2, AlertTriangle, XCircle, Zap, Database, Globe2, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertTriangle, XCircle, Zap, Database, Globe2, Loader2, Info, X } from "lucide-react";
 
 const CoverageMap = lazy(() =>
   import("@/components/CoverageMap").then((m) => ({ default: m.CoverageMap }))
@@ -65,9 +65,31 @@ function MapFallback() {
 
 export default function Home() {
   const { data: meta } = useGetApiMeta();
+  const [betaDismissed, setBetaDismissed] = useState(false);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+
+      {/* ── Beta notice ── */}
+      {meta?.status === "beta" && meta.notice && !betaDismissed && (
+        <div
+          className="mb-6 flex items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm dark:border-blue-800 dark:bg-blue-950/30"
+          data-testid="banner-beta-notice"
+        >
+          <div className="flex items-start gap-2.5">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+            <p className="text-blue-800 dark:text-blue-200">{meta.notice}</p>
+          </div>
+          <button
+            aria-label="Dismiss beta notice"
+            onClick={() => setBetaDismissed(true)}
+            className="shrink-0 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200"
+            data-testid="button-dismiss-beta"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <div className="mb-8 max-w-3xl">
