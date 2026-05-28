@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
   useListCoverage,
   useValidateAddress,
+  useGetApiMeta,
   getValidateAddressQueryKey,
 } from "@workspace/api-client-react";
 import type { ValidateAddressParams, CountryCoverage } from "@workspace/api-client-react";
@@ -322,6 +323,7 @@ export default function Try() {
   const [, setLocation] = useLocation();
   const searchStr = useSearch();
   const { data: coverageData } = useListCoverage();
+  const { data: apiMeta } = useGetApiMeta();
   const [submittedParams, setSubmittedParams] = useState<ValidateAddressParams | null>(null);
 
   const countryFromUrl = useMemo(() => {
@@ -385,6 +387,16 @@ export default function Try() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      {apiMeta?.status === "beta" && apiMeta.notice && (
+        <div
+          data-testid="banner-beta-notice"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-600/40 dark:bg-amber-950/30 dark:text-amber-300"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <span>{apiMeta.notice}</span>
+        </div>
+      )}
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-foreground" data-testid="heading-try">
           API Explorer

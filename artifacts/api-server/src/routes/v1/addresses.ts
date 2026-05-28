@@ -76,6 +76,9 @@ router.get(
         return;
       }
       if (err instanceof UpstreamError) {
+        if ((err as any).retryAfter) {
+          res.setHeader("Retry-After", String((err as any).retryAfter));
+        }
         sendError(res, err.statusCode, "upstream_error", err.message);
         return;
       }

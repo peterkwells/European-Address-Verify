@@ -1,5 +1,6 @@
 import type { AddressInput, NormalisedAddress, ValidationResult } from "./types.js";
 import { UpstreamError } from "./types.js";
+import { isOpen, retryAfterSeconds, recordSuccess, recordFailure } from "../circuit-breaker.js";
 
 const TIMEOUT_MS = 8000;
 
@@ -14,9 +15,24 @@ async function fetchWithTimeout(url: string): Promise<Response> {
   }
 }
 
+function assertCircuitClosed(key: string): void {
+  if (isOpen(key)) {
+    const after = retryAfterSeconds(key);
+    const err = new UpstreamError(
+      `Upstream service '${key}' is temporarily unavailable (circuit open). Retry after ${after}s.`,
+      503,
+    );
+    (err as any).retryAfter = after;
+    throw err;
+  }
+}
+
 export async function validateFR(
   input: AddressInput,
 ): Promise<ValidationResult> {
+  const key = "FR";
+  assertCircuitClosed(key);
+
   const parts: string[] = [];
   if (input.house_number) parts.push(input.house_number);
   if (input.street) parts.push(input.street);
@@ -29,16 +45,20 @@ export async function validateFR(
   try {
     resp = await fetchWithTimeout(url);
   } catch (err) {
+    recordFailure(key);
     throw new UpstreamError(
       `Base Adresse Nationale API unreachable: ${(err as Error).message}`,
     );
   }
 
   if (!resp.ok) {
+    recordFailure(key);
     throw new UpstreamError(
       `Base Adresse Nationale API returned HTTP ${resp.status}`,
     );
   }
+
+  recordSuccess(key);
 
   const data = (await resp.json()) as {
     features: Array<{
@@ -105,6 +125,9 @@ export async function validateFR(
 export async function validateNL(
   input: AddressInput,
 ): Promise<ValidationResult> {
+  const key = "NL";
+  assertCircuitClosed(key);
+
   const parts: string[] = [input.postcode];
   if (input.house_number) parts.push(input.house_number);
 
@@ -115,14 +138,18 @@ export async function validateNL(
   try {
     resp = await fetchWithTimeout(url);
   } catch (err) {
+    recordFailure(key);
     throw new UpstreamError(
       `PDOK Locatieserver API unreachable: ${(err as Error).message}`,
     );
   }
 
   if (!resp.ok) {
+    recordFailure(key);
     throw new UpstreamError(`PDOK Locatieserver API returned HTTP ${resp.status}`);
   }
+
+  recordSuccess(key);
 
   const data = (await resp.json()) as {
     response: {
@@ -182,6 +209,9 @@ export async function validateNL(
 export async function validateNO(
   input: AddressInput,
 ): Promise<ValidationResult> {
+  const key = "NO";
+  assertCircuitClosed(key);
+
   const params = new URLSearchParams({
     postnummer: input.postcode,
     treffPerSide: "1",
@@ -197,14 +227,18 @@ export async function validateNO(
   try {
     resp = await fetchWithTimeout(url);
   } catch (err) {
+    recordFailure(key);
     throw new UpstreamError(
       `Kartverket API unreachable: ${(err as Error).message}`,
     );
   }
 
   if (!resp.ok) {
+    recordFailure(key);
     throw new UpstreamError(`Kartverket API returned HTTP ${resp.status}`);
   }
+
+  recordSuccess(key);
 
   const data = (await resp.json()) as {
     metadata?: { totaltAntallTreff?: number };
@@ -264,6 +298,9 @@ export async function validateNO(
 export async function validateDK(
   input: AddressInput,
 ): Promise<ValidationResult> {
+  const key = "DK";
+  assertCircuitClosed(key);
+
   const params = new URLSearchParams({ postnr: input.postcode, per_side: "1" });
   if (input.street) params.set("vejnavn", input.street);
   if (input.house_number) params.set("husnr", input.house_number);
@@ -274,6 +311,7 @@ export async function validateDK(
   try {
     resp = await fetchWithTimeout(url);
   } catch (err) {
+    recordFailure(key);
     throw new UpstreamError(
       `Datafordeler (DAWA) API unreachable: ${(err as Error).message}`,
     );
@@ -288,6 +326,7 @@ export async function validateDK(
     try {
       resp = await fetchWithTimeout(dawaUrl);
     } catch (err2) {
+      recordFailure(key);
       throw new UpstreamError(
         `Danish address APIs unreachable: ${(err2 as Error).message}`,
       );
@@ -295,8 +334,11 @@ export async function validateDK(
   }
 
   if (!resp.ok) {
+    recordFailure(key);
     throw new UpstreamError(`Danish address API returned HTTP ${resp.status}`);
   }
+
+  recordSuccess(key);
 
   const data = (await resp.json()) as Array<{
     husnr?: string;
