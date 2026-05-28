@@ -7,6 +7,7 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 const rawPort = process.env.PORT ?? "5173";
 const port = Number(rawPort);
 const basePath = process.env.BASE_PATH ?? "/";
+const e2eApiPort = process.env.E2E_API_PORT;
 
 export default defineConfig({
   base: basePath,
@@ -45,6 +46,13 @@ export default defineConfig({
     strictPort: true,
     host: "0.0.0.0",
     allowedHosts: true,
+    ...(e2eApiPort
+      ? {
+          proxy: {
+            "/api": `http://localhost:${e2eApiPort}`,
+          },
+        }
+      : {}),
     fs: {
       strict: true,
     },
