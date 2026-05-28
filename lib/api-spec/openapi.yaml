@@ -315,8 +315,13 @@ components:
           enum: [open-api, bulk-local, format+reference, format-only, restricted]
         data_source:
           type: string
+        data_source_url:
+          type: string
         licence:
           type: string
+        licence_url:
+          type: string
+          nullable: true
         cost:
           type: string
         legal_risk:
@@ -330,6 +335,7 @@ components:
         - tier
         - validation_method
         - data_source
+        - data_source_url
         - licence
         - cost
         - legal_risk

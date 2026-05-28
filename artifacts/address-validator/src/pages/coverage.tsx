@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useListCoverage } from "@workspace/api-client-react";
 import type { CountryCoverage } from "@workspace/api-client-react";
-import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUpDown, ExternalLink } from "lucide-react";
 
 type SortField = "country_name" | "tier" | "cost" | "legal_risk";
 type SortDir = "asc" | "desc";
@@ -26,13 +26,6 @@ const TIER_COLORS: Record<number, { badge: string; dot: string }> = {
     badge: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300",
     dot: "bg-red-500",
   },
-};
-
-const RISK_COLORS: Record<string, string> = {
-  low: "text-emerald-700 dark:text-emerald-400",
-  medium: "text-amber-700 dark:text-amber-400",
-  high: "text-orange-700 dark:text-orange-400",
-  "very-high": "text-red-700 dark:text-red-400",
 };
 
 const RISK_BADGE: Record<string, string> = {
@@ -141,10 +134,7 @@ export default function Coverage() {
                   Method
                 </th>
                 <th className="hidden px-4 py-3 text-left font-semibold text-foreground md:table-cell">
-                  Data Source
-                </th>
-                <th className="hidden px-4 py-3 text-left font-semibold text-foreground lg:table-cell">
-                  Licence
+                  Data Source &amp; Licence
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-foreground">
                   <button
@@ -172,7 +162,7 @@ export default function Coverage() {
               {isLoading &&
                 Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i}>
-                    {Array.from({ length: 7 }).map((__, j) => (
+                    {Array.from({ length: 6 }).map((__, j) => (
                       <td key={j} className="px-4 py-3">
                         <div className="h-4 animate-pulse rounded bg-muted" style={{ width: `${40 + Math.random() * 40}%` }} />
                       </td>
@@ -182,7 +172,7 @@ export default function Coverage() {
 
               {error && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     Failed to load coverage data.
                   </td>
                 </tr>
@@ -190,6 +180,7 @@ export default function Coverage() {
 
               {sorted.map((country) => {
                 const tierStyle = TIER_COLORS[country.tier];
+                const hasSource = country.tier === 1 || country.tier === 2;
                 return (
                   <tr
                     key={country.country_code}
@@ -213,12 +204,44 @@ export default function Coverage() {
                     <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                       {METHOD_LABELS[country.validation_method] ?? country.validation_method}
                     </td>
-                    <td className="hidden px-4 py-3 text-xs text-muted-foreground md:table-cell max-w-[160px] truncate">
-                      {country.data_source}
+
+                    {/* Data Source + Licence — combined column for tiers 1 & 2 */}
+                    <td className="hidden px-4 py-3 md:table-cell">
+                      {hasSource ? (
+                        <div className="space-y-1">
+                          <a
+                            href={country.data_source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                            data-testid={`link-source-${country.country_code}`}
+                          >
+                            {country.data_source}
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </a>
+                          {country.licence_url ? (
+                            <a
+                              href={country.licence_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 hover:underline"
+                              data-testid={`link-licence-${country.country_code}`}
+                            >
+                              <code className="rounded bg-muted px-1.5 py-0.5 text-xs text-primary">
+                                {country.licence}
+                              </code>
+                            </a>
+                          ) : (
+                            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+                              {country.licence}
+                            </code>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">{country.data_source}</span>
+                      )}
                     </td>
-                    <td className="hidden px-4 py-3 lg:table-cell">
-                      <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{country.licence}</code>
-                    </td>
+
                     <td className="px-4 py-3 text-xs text-muted-foreground">
                       {country.cost}
                     </td>

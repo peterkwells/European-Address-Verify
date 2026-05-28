@@ -139,7 +139,9 @@ export interface CountryCoverage {
   tier: CountryCoverageTier;
   validation_method: CountryCoverageValidationMethod;
   data_source: string;
+  data_source_url: string;
   licence: string;
+  licence_url?: string | null;
   cost: string;
   legal_risk: CountryCoverageLegalRisk;
   _links: Links;

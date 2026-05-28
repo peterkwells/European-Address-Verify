@@ -20,7 +20,9 @@ router.get("/", async (_req: Request, res: Response): Promise<void> => {
     tier: c.tier,
     validation_method: c.validation_method,
     data_source: c.data_source,
+    data_source_url: c.data_source_url,
     licence: c.licence,
+    licence_url: c.licence_url,
     cost: c.cost,
     legal_risk: c.legal_risk,
     _links: {
