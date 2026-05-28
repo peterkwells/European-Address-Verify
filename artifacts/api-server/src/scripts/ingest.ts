@@ -13,23 +13,31 @@
  * Each ingestion:
  *   1. Downloads the authoritative dataset for the country
  *   2. Verifies checksum — skips if already loaded with same checksum
- *   3. Parses the CSV/GeoJSON format and normalises field names
+ *   3. Parses the dataset format and normalises field names
  *   4. Bulk-inserts into the local PostgreSQL database
  *   5. Records the ingestion in dataset_ingestions
  *
  * Datasets are large. Ensure sufficient disk space and a stable connection.
+ *
+ * Data sources:
+ *   IT  — ANNCSU Indirizzario Nazionale (CC0); full street + house number data.
+ *         Postcodes resolved via spatial join with GeoNames IT.
+ *   BE  — BOSA openaddress (CC0); street + house number data for all three regions.
+ *   All others — GeoNames postal codes (CC BY 4.0); postcode + city only.
  */
 
 import { ingestGeoNames } from "./ingesters/geonames.js";
+import { ingestBosa } from "./ingesters/bosa-be.js";
+import { ingestAnncsuIT } from "./ingesters/anncsu-it.js";
 import { pool } from "@workspace/db";
 
 const GEONAMES_BASE = "https://download.geonames.org/export/zip";
 
 const INGESTERS: Record<string, () => Promise<void>> = {
-  BE: () => ingestGeoNames("BE", `${GEONAMES_BASE}/BE.zip`),
+  BE: () => ingestBosa(),
   AT: () => ingestGeoNames("AT", `${GEONAMES_BASE}/AT.zip`),
   DE: () => ingestGeoNames("DE", `${GEONAMES_BASE}/DE.zip`),
-  IT: () => ingestGeoNames("IT", `${GEONAMES_BASE}/IT.zip`),
+  IT: () => ingestAnncsuIT(),
   ES: () => ingestGeoNames("ES", `${GEONAMES_BASE}/ES.zip`),
   PT: () => ingestGeoNames("PT", `${GEONAMES_BASE}/PT.zip`),
   SE: () => ingestGeoNames("SE", `${GEONAMES_BASE}/SE.zip`),

@@ -107,16 +107,17 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
-    data_source: "GeoNames postal codes",
-    data_source_url: "https://download.geonames.org/export/zip/",
-    licence: "CC-BY-4.0",
-    licence_url: "https://creativecommons.org/licenses/by/4.0/",
+      "Address is validated against a locally ingested copy of the Belgian BOSA Best Address dataset (CC0). Postcode, city, and house number are verified. Street name is not stored in the BOSA openaddress export.",
+    data_source: "BOSA Best Address (openaddress.bosa.be)",
+    data_source_url: "https://opendata.bosa.be/download/best/",
+    licence: "CC0-1.0",
+    licence_url: "https://creativecommons.org/publicdomain/zero/1.0/",
     cost: "Free",
-    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
+    cost_description:
+      "BOSA Best Address open data is freely downloadable under CC0 1.0 with no registration required.",
     legal_risk: "low",
     legal_risk_notes:
-      "CC BY 4.0 — attribution required. GeoNames data for Belgium is compiled from official Belgian open data sources. Commercial use permitted.",
+      "CC0 1.0 — no restrictions on use or redistribution. BOSA (Belgian Federal Public Service Policy and Support) is the official Belgian government source for address data. Commercial use fully permitted.",
   },
 
   AT: {
@@ -161,16 +162,17 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
-    data_source: "GeoNames postal codes",
-    data_source_url: "https://download.geonames.org/export/zip/",
-    licence: "CC-BY-4.0",
-    licence_url: "https://creativecommons.org/licenses/by/4.0/",
+      "Address is validated against a locally ingested copy of the ANNCSU Indirizzario Nazionale (CC0), Italy's authoritative national civic address register managed jointly by ISTAT and the Agenzia delle Entrate. Postcode, city, street, and house number are all verified. Postcodes are resolved by spatial join with GeoNames IT postal codes.",
+    data_source: "ANNCSU Indirizzario Nazionale",
+    data_source_url: "https://www.anncsu.gov.it/",
+    licence: "CC0-1.0",
+    licence_url: "https://creativecommons.org/publicdomain/zero/1.0/",
     cost: "Free",
-    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
+    cost_description:
+      "ANNCSU open data is freely downloadable under CC0 1.0 with no registration required, pursuant to EU Regulation 2023/138 (High-Value Datasets).",
     legal_risk: "low",
     legal_risk_notes:
-      "CC BY 4.0 — attribution required. GeoNames data for Italy is compiled from official Italian open data sources. Commercial use permitted.",
+      "CC0 1.0 — no restrictions on use or redistribution. The ANNCSU is co-managed by ISTAT (Italian National Institute of Statistics) and Agenzia delle Entrate (Revenue Agency) as a high-value dataset under EU Regulation 2023/138. Commercial use fully permitted.",
   },
 
   ES: {

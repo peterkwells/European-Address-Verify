@@ -43,7 +43,11 @@ interface BosaRecord {
 export async function ingestBosa(): Promise<void> {
   const { Extract } = await import("unzip-stream");
 
-  const downloads = await Promise.all(BOSA_URLS.map((url) => downloadFile(url)));
+  const downloads: Array<{ path: string; checksum: string }> = [];
+  for (const url of BOSA_URLS) {
+    console.log(`  Downloading ${url}...`);
+    downloads.push(await downloadFile(url));
+  }
   const combinedChecksum = downloads.map((d) => d.checksum).join(":");
 
   if (await checkAlreadyIngested("BE", combinedChecksum)) {
