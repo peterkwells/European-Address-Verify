@@ -1,0 +1,87 @@
+European Address Validator — Third-Party Data Attributions
+===========================================================
+
+This software fetches or ingests address data from third-party sources.
+The code itself is MIT-licensed (see LICENSE). The data is governed by
+the licences listed below, which are separate from and do not affect the
+code licence.
+
+───────────────────────────────────────────────────────────────────────
+
+1. GeoNames Postal Code Database
+   Countries: AT, CZ, DE, ES, FI, PL, PT, SE
+              (also used as postcode reference for IT via spatial join)
+   Source:    https://download.geonames.org/export/zip/
+   Licence:   Creative Commons Attribution 4.0 International (CC BY 4.0)
+              https://creativecommons.org/licenses/by/4.0/
+   Copyright: GeoNames (https://www.geonames.org)
+   Attribution required by licence terms.
+
+2. Base Adresse Nationale (BAN) — France
+   Countries: FR
+   Source:    https://api-adresse.data.gouv.fr/
+   Licence:   Open Database Licence 1.0 (ODbL)
+              https://opendatacommons.org/licenses/odbl/1-0/
+   Producer:  La Poste, IGN, OpenStreetMap contributors, ARCEP,
+              SDIS, Etalab — under DINUM / data.gouv.fr
+   Note:      Accessed via real-time API; no bulk data is stored.
+
+3. BOSA Best Address — Belgium
+   Countries: BE
+   Source:    https://opendata.bosa.be/
+   Licence:   Creative Commons Zero 1.0 (CC0)
+              https://creativecommons.org/publicdomain/zero/1.0/
+   Producer:  Belgian Official Source of Addresses (BOSA)
+   Note:      No attribution legally required under CC0.
+
+4. ANNCSU Indirizzario Nazionale — Italy
+   Countries: IT
+   Source:    https://www.anncsu.gov.it/
+   Licence:   Creative Commons Zero 1.0 (CC0)
+              https://creativecommons.org/publicdomain/zero/1.0/
+   Producer:  ANNCSU (Agenzia Nazionale per la Coesione Sociale e l'Urbanistica)
+   Note:      No attribution legally required under CC0.
+
+5. PDOK Locatieserver / BAG — Netherlands
+   Countries: NL
+   Source:    https://api.pdok.nl/bzk/locatieserver/search/v3_1/
+   Licence:   Creative Commons Zero 1.0 (CC0) / open government data
+              https://creativecommons.org/publicdomain/zero/1.0/
+   Producer:  Kadaster / Dutch Ministry of the Interior (BZK)
+   Note:      Accessed via real-time API; no bulk data is stored.
+
+6. Kartverket National Address API — Norway
+   Countries: NO
+   Source:    https://ws.geonorge.no/adresser/v1/
+   Licence:   Norwegian Licence for Open Government Data 2.0 (NLOD 2.0)
+              https://data.norge.no/nlod/en/2.0
+   Producer:  Kartverket (Norwegian Mapping Authority)
+   Attribution required by licence terms.
+   Note:      Accessed via real-time API; no bulk data is stored.
+
+7. DAWA — Danmarks Adresser Web API — Denmark
+   Countries: DK
+   Source:    https://api.dataforsyningen.dk/adresser
+   Licence:   Open Government Data Licence (Danish OGDL)
+              https://www.dataforsyningen.dk/node/246
+   Producer:  Danish Agency for Data Supply and Efficiency (SDFE)
+   Note:      Accessed via real-time API; no bulk data is stored.
+
+8. Swiss Post Postcode List — Switzerland
+   Countries: CH
+   Source:    https://www.post.ch/en/business/a-z-of-subjects/address-data
+   Licence:   Swiss Post Terms of Use (non-commercial reference use)
+   Producer:  Swiss Post / Die Post
+   Note:      Used only for postcode format validation; no data is stored
+              or redistributed.
+
+9. Royal Mail PAF / OS AddressBase — United Kingdom
+   Countries: GB
+   Licence:   Commercial / Proprietary
+   Note:      No Royal Mail or Ordnance Survey data is used, stored, or
+              distributed. GB validation is restricted to format-only checks.
+
+───────────────────────────────────────────────────────────────────────
+
+For questions about data licences contact the respective producers at
+the URLs listed above.
