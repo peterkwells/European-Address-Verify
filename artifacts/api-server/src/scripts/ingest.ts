@@ -20,22 +20,22 @@
  * Datasets are large. Ensure sufficient disk space and a stable connection.
  */
 
-import { ingestBosa } from "./ingesters/bosa-be.js";
-import { ingestBev } from "./ingesters/bev-at.js";
-import { ingestOpenAddresses } from "./ingesters/openaddresses.js";
+import { ingestGeoNames } from "./ingesters/geonames.js";
 import { pool } from "@workspace/db";
 
+const GEONAMES_BASE = "https://download.geonames.org/export/zip";
+
 const INGESTERS: Record<string, () => Promise<void>> = {
-  BE: ingestBosa,
-  AT: ingestBev,
-  DE: () => ingestOpenAddresses("DE", "https://results.openaddresses.io/addresses/global/de.zip"),
-  IT: () => ingestOpenAddresses("IT", "https://results.openaddresses.io/addresses/global/it.zip"),
-  ES: () => ingestOpenAddresses("ES", "https://results.openaddresses.io/addresses/global/es.zip"),
-  PT: () => ingestOpenAddresses("PT", "https://results.openaddresses.io/addresses/global/pt.zip"),
-  SE: () => ingestOpenAddresses("SE", "https://results.openaddresses.io/addresses/global/se.zip"),
-  FI: () => ingestOpenAddresses("FI", "https://results.openaddresses.io/addresses/global/fi.zip"),
-  PL: () => ingestOpenAddresses("PL", "https://results.openaddresses.io/addresses/global/pl.zip"),
-  CZ: () => ingestOpenAddresses("CZ", "https://results.openaddresses.io/addresses/global/cz.zip"),
+  BE: () => ingestGeoNames("BE", `${GEONAMES_BASE}/BE.zip`),
+  AT: () => ingestGeoNames("AT", `${GEONAMES_BASE}/AT.zip`),
+  DE: () => ingestGeoNames("DE", `${GEONAMES_BASE}/DE.zip`),
+  IT: () => ingestGeoNames("IT", `${GEONAMES_BASE}/IT.zip`),
+  ES: () => ingestGeoNames("ES", `${GEONAMES_BASE}/ES.zip`),
+  PT: () => ingestGeoNames("PT", `${GEONAMES_BASE}/PT.zip`),
+  SE: () => ingestGeoNames("SE", `${GEONAMES_BASE}/SE.zip`),
+  FI: () => ingestGeoNames("FI", `${GEONAMES_BASE}/FI.zip`),
+  PL: () => ingestGeoNames("PL", `${GEONAMES_BASE}/PL.zip`),
+  CZ: () => ingestGeoNames("CZ", `${GEONAMES_BASE}/CZ.zip`),
 };
 
 async function main() {

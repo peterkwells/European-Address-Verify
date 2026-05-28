@@ -107,17 +107,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested copy of the BOSA opendata.bosa.be dataset, the official Belgian federal address register published under CC0.",
-    data_source: "BOSA opendata.bosa.be (Best)",
-    data_source_url: "https://opendata.bosa.be",
-    licence: "CC0-1.0",
-    licence_url: "https://creativecommons.org/publicdomain/zero/1.0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description:
-      "Data is free to download and use under CC0 from the Belgian federal government.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "CC0 1.0 — no copyright restrictions. Published by BOSA (Federal Public Service Policy and Support). Free for any use including commercial.",
+      "CC BY 4.0 — attribution required. GeoNames data for Belgium is compiled from official Belgian open data sources. Commercial use permitted.",
   },
 
   AT: {
@@ -126,18 +125,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested copy of the BEV Adressregister, the official Austrian national address register.",
-    data_source: "BEV Adressregister",
-    data_source_url:
-      "https://www.bev.gv.at/Portal/Page/Portal/BEV/Produkte/Adressen/Adressregister",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
     licence: "CC-BY-4.0",
     licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description:
-      "The BEV Adressregister is freely downloadable under CC BY 4.0.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "CC BY 4.0 — attribution required. Published by the Federal Office of Metrology and Surveying (BEV), an Austrian government agency. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data is compiled from national open data sources and is widely used for postcode/locality validation. Commercial use permitted.",
   },
 
   DE: {
@@ -146,17 +143,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from official German Länder open data sources.",
-    data_source: "OpenAddresses compiled (German Länder open data)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description:
-      "Data is free to download from OpenAddresses, which compiles it from official German open data sources.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from Länder open data sources (primarily dl-de/by-2-0 and CC BY 4.0) and aggregated by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Germany is compiled from official Länder open data sources. Commercial use permitted.",
   },
 
   IT: {
@@ -165,16 +161,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Italian municipal open data sources.",
-    data_source: "OpenAddresses compiled (Italian municipal open data)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from Italian open data sources (CC BY 4.0 and IODL 2.0 licensed municipal datasets) by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Italy is compiled from official Italian open data sources. Commercial use permitted.",
   },
 
   ES: {
@@ -183,16 +179,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from the Spanish Catastro and municipal open data.",
-    data_source: "OpenAddresses compiled (Catastro + Spanish open data)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from the Catastro (Spanish cadastre, open data) and municipal open datasets by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Spain is compiled from Catastro and other official Spanish open data. Commercial use permitted.",
   },
 
   PT: {
@@ -201,16 +197,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Portuguese open data sources.",
-    data_source: "OpenAddresses compiled (Portuguese open data)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from Portuguese open government data under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Portugal is compiled from official Portuguese open government data. Commercial use permitted.",
   },
 
   SE: {
@@ -219,16 +215,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Lantmäteriet and municipal open data.",
-    data_source: "OpenAddresses compiled (Lantmäteriet open data)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from Lantmäteriet open data (CC0 and CC BY licence) under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Sweden is compiled from Lantmäteriet open data. Commercial use permitted.",
   },
 
   FI: {
@@ -237,16 +233,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from the National Land Survey of Finland open data.",
-    data_source: "OpenAddresses compiled (National Land Survey of Finland)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from National Land Survey of Finland open data (CC BY 4.0) under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Finland is compiled from National Land Survey of Finland open data. Commercial use permitted.",
   },
 
   PL: {
@@ -255,16 +251,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from Polish government open data (GUS/PRG).",
-    data_source: "OpenAddresses compiled (PRG — Polish Address Register)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from PRG (Polish Address Register), published by GUS under an open government licence, aggregated by OpenAddresses under ODbL. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for Poland is compiled from PRG (Polish Address Register) and other official sources. Commercial use permitted.",
   },
 
   CZ: {
@@ -273,16 +269,16 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested dataset compiled by OpenAddresses from ČÚZK (Czech Office for Surveying, Mapping and Cadastre) open data.",
-    data_source: "OpenAddresses compiled (ČÚZK open data)",
-    data_source_url: "https://openaddresses.io",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+      "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
+    data_source: "GeoNames postal codes",
+    data_source_url: "https://download.geonames.org/export/zip/",
+    licence: "CC-BY-4.0",
+    licence_url: "https://creativecommons.org/licenses/by/4.0/",
     cost: "Free",
-    cost_description: "Free to download from OpenAddresses.",
+    cost_description: "GeoNames postal code data is freely downloadable under CC BY 4.0.",
     legal_risk: "low",
     legal_risk_notes:
-      "Compiled from ČÚZK open data (CC BY 4.0) under ODbL by OpenAddresses. Attribution required. Commercial use permitted.",
+      "CC BY 4.0 — attribution required. GeoNames data for the Czech Republic is compiled from ČÚZK (Czech Office for Surveying, Mapping and Cadastre) open data. Commercial use permitted.",
   },
 
   IE: {

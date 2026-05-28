@@ -69,6 +69,26 @@ export async function validateBulkLocal(
         .limit(1);
 
       if (postcodeMatches.length > 0) {
+        const datasetHasStreets = postcodeMatches.some((m) => m.street !== null);
+        if (!datasetHasStreets) {
+          warnings.push(
+            "Postcode is valid; street-level data is not available for this country in the current dataset — unable to verify street or city",
+          );
+          return {
+            valid: true,
+            confidence: "medium",
+            method: "bulk-local",
+            source: entry.data_source,
+            source_url: entry.data_source_url,
+            licence: entry.licence,
+            normalised_address: {
+              postcode: postcodeMatches[0]!.postcode ?? input.postcode,
+              city: postcodeMatches[0]!.city ?? null,
+              country_code: countryUpper,
+            },
+            warnings,
+          };
+        }
         warnings.push(
           "Postcode exists but the specific street or city was not found — the address may be partially incorrect",
         );
