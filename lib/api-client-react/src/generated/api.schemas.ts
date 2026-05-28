@@ -24,6 +24,10 @@ export interface Links {
 export interface ApiMeta {
   /** API version */
   version: string;
+  /** Service status (e.g. beta) */
+  status: string;
+  /** Human-readable notice about the service status */
+  notice: string;
   description: string;
   documentation_url: string;
   /** Number of supported countries */

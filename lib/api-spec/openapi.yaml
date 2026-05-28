@@ -130,6 +130,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds to wait before retrying
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
         "502":
           description: Upstream authoritative API is unavailable
           content:
@@ -202,6 +213,12 @@ components:
         version:
           type: string
           description: API version
+        status:
+          type: string
+          description: Service status (e.g. beta)
+        notice:
+          type: string
+          description: Human-readable notice about the service status
         description:
           type: string
         documentation_url:
@@ -222,6 +239,8 @@ components:
           $ref: "#/components/schemas/Links"
       required:
         - version
+        - status
+        - notice
         - description
         - documentation_url
         - country_count

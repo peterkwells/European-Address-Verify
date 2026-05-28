@@ -37,6 +37,9 @@ export function Nav() {
                   EU
                 </span>
                 <span className="hidden sm:inline">Address Validator</span>
+                <span className="hidden sm:inline-flex items-center rounded-full border border-amber-400/50 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-500/40">
+                  Beta
+                </span>
               </span>
             </Link>
 

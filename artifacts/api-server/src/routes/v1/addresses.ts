@@ -8,6 +8,7 @@ import {
 } from "../../lib/validators/index.js";
 import { getCountry } from "../../lib/coverage-registry.js";
 import { sendError } from "./errors.js";
+import { validateLimiter } from "../../lib/rate-limiter.js";
 
 function toAsciiHeader(value: string): string {
   return value.replace(/[^\x20-\x7E]/g, "-");
@@ -17,6 +18,7 @@ const router: IRouter = Router();
 
 router.get(
   "/validate",
+  validateLimiter,
   async (req: Request, res: Response): Promise<void> => {
     const parsed = ValidateAddressQueryParams.safeParse(req.query);
     if (!parsed.success) {
