@@ -2,7 +2,7 @@ import type { AddressInput, NormalisedAddress, ValidationResult } from "./types.
 import { UpstreamError } from "./types.js";
 import { isOpen, retryAfterSeconds, recordSuccess, recordFailure } from "../circuit-breaker.js";
 
-const TIMEOUT_MS = 8000;
+const TIMEOUT_MS = 5000;
 
 async function fetchWithTimeout(url: string): Promise<Response> {
   const controller = new AbortController();
@@ -15,15 +15,21 @@ async function fetchWithTimeout(url: string): Promise<Response> {
   }
 }
 
+function isTimeoutError(err: unknown): boolean {
+  return (
+    err instanceof Error &&
+    (err.name === "AbortError" || err.name === "TimeoutError")
+  );
+}
+
 function assertCircuitClosed(key: string): void {
   if (isOpen(key)) {
     const after = retryAfterSeconds(key);
-    const err = new UpstreamError(
+    throw new UpstreamError(
       `Upstream service '${key}' is temporarily unavailable (circuit open). Retry after ${after}s.`,
       503,
+      after,
     );
-    (err as any).retryAfter = after;
-    throw err;
   }
 }
 
@@ -46,6 +52,12 @@ export async function validateFR(
     resp = await fetchWithTimeout(url);
   } catch (err) {
     recordFailure(key);
+    if (isTimeoutError(err)) {
+      throw new UpstreamError(
+        `Base Adresse Nationale API timed out after ${TIMEOUT_MS / 1000}s`,
+        502,
+      );
+    }
     throw new UpstreamError(
       `Base Adresse Nationale API unreachable: ${(err as Error).message}`,
     );
@@ -139,6 +151,12 @@ export async function validateNL(
     resp = await fetchWithTimeout(url);
   } catch (err) {
     recordFailure(key);
+    if (isTimeoutError(err)) {
+      throw new UpstreamError(
+        `PDOK Locatieserver API timed out after ${TIMEOUT_MS / 1000}s`,
+        502,
+      );
+    }
     throw new UpstreamError(
       `PDOK Locatieserver API unreachable: ${(err as Error).message}`,
     );
@@ -228,6 +246,12 @@ export async function validateNO(
     resp = await fetchWithTimeout(url);
   } catch (err) {
     recordFailure(key);
+    if (isTimeoutError(err)) {
+      throw new UpstreamError(
+        `Kartverket API timed out after ${TIMEOUT_MS / 1000}s`,
+        502,
+      );
+    }
     throw new UpstreamError(
       `Kartverket API unreachable: ${(err as Error).message}`,
     );
@@ -312,6 +336,12 @@ export async function validateDK(
     resp = await fetchWithTimeout(url);
   } catch (err) {
     recordFailure(key);
+    if (isTimeoutError(err)) {
+      throw new UpstreamError(
+        `Datafordeler API timed out after ${TIMEOUT_MS / 1000}s`,
+        502,
+      );
+    }
     throw new UpstreamError(
       `Datafordeler (DAWA) API unreachable: ${(err as Error).message}`,
     );
@@ -327,6 +357,12 @@ export async function validateDK(
       resp = await fetchWithTimeout(dawaUrl);
     } catch (err2) {
       recordFailure(key);
+      if (isTimeoutError(err2)) {
+        throw new UpstreamError(
+          `Danish address APIs timed out after ${TIMEOUT_MS / 1000}s`,
+          502,
+        );
+      }
       throw new UpstreamError(
         `Danish address APIs unreachable: ${(err2 as Error).message}`,
       );

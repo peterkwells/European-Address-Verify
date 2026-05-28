@@ -34,12 +34,18 @@ export interface AddressInput {
 }
 
 export class UpstreamError extends Error {
+  public readonly retryAfter?: number;
+
   constructor(
     message: string,
     public readonly statusCode: number = 502,
+    retryAfter?: number,
   ) {
     super(message);
     this.name = "UpstreamError";
+    if (retryAfter !== undefined) {
+      this.retryAfter = retryAfter;
+    }
   }
 }
 
