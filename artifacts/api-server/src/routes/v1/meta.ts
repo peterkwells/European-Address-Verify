@@ -57,7 +57,7 @@ router.get("/", async (_req: Request, res: Response): Promise<void> => {
   res.json({
     version: "1.0.0",
     status: "beta",
-    notice: "This is a pre-release service. Rate limits apply. Do not use in production.",
+    notice: "This is a pre-release service. Rate limits apply. Do not use in production. Send any feedback to peterkwells@gmail.com.",
     description:
       "European Address Validation API. Validates addresses across European countries using openly licensed, authoritative data sources. Built in accordance with GDS API technical and data standards (https://www.gov.uk/guidance/gds-api-technical-and-data-standards).",
     documentation_url: "/api/v1/coverage",
