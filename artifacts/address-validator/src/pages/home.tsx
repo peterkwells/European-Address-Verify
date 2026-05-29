@@ -33,7 +33,7 @@ const TIERS = [
   {
     tier: 3,
     label: "Tier 3 — Coming Soon",
-    description: "Openly licensed data identified but not yet fully loaded. Currently validates postcode and city only via reference data.",
+    description: "Openly licensed data identified. Validates postcode and city for most countries (GeoNames loaded); postcode format or existence check for others. Full street address datasets not yet loaded.",
     color: "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800",
     badge: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
     icon: AlertTriangle,

@@ -325,9 +325,9 @@ export const REGISTRY: Record<string, CountryEntry> = {
     country_code: "LU",
     country_name: "Luxembourg",
     tier: 3,
-    validation_method: "format+reference",
+    validation_method: "format-only",
     validation_method_description:
-      "Luxembourg postcode format is validated by regex. Luxembourg uses a 4-digit numeric postcode system.",
+      "Luxembourg postcode format is validated by regex only (4-digit numeric). Luxembourg uses a 4-digit numeric postcode system. No openly licensed authoritative address dataset is currently ingested.",
     data_source: "postcode-validator",
     data_source_url: "https://www.npmjs.com/package/postcode-validator",
     licence: "MIT",
