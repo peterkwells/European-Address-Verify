@@ -19,9 +19,11 @@ export interface ApiMeta {
   country_count: number;
   /** Countries with live authoritative API validation */
   tier_1_count: number;
-  /** Countries with bulk-local or format-reference validation */
+  /** Countries with full bulk address dataset loaded */
   tier_2_count: number;
-  /** Countries with restricted data (no validation) */
+  /** Countries with bulk dataset coming soon */
   tier_3_count: number;
+  /** Countries with restricted data (no validation) */
+  tier_4_count: number;
   _links: Links;
 }

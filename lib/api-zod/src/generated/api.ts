@@ -30,8 +30,9 @@ export const GetApiMetaResponse = zod.object({
   "documentation_url": zod.string(),
   "country_count": zod.number().describe('Number of supported countries'),
   "tier_1_count": zod.number().describe('Countries with live authoritative API validation'),
-  "tier_2_count": zod.number().describe('Countries with bulk-local or format-reference validation'),
-  "tier_3_count": zod.number().describe('Countries with restricted data (no validation)'),
+  "tier_2_count": zod.number().describe('Countries with full bulk address dataset loaded'),
+  "tier_3_count": zod.number().describe('Countries with bulk dataset coming soon'),
+  "tier_4_count": zod.number().describe('Countries with restricted data (no validation)'),
   "_links": zod.object({
   "self": zod.object({
   "href": zod.string()

@@ -10,6 +10,7 @@ router.get("/", async (_req: Request, res: Response): Promise<void> => {
   const tier1 = getCountriesByTier(1);
   const tier2 = getCountriesByTier(2);
   const tier3 = getCountriesByTier(3);
+  const tier4 = getCountriesByTier(4);
 
   const bulkLocalCountries = tier2.filter(
     (c) => c.validation_method === "bulk-local",
@@ -64,6 +65,7 @@ router.get("/", async (_req: Request, res: Response): Promise<void> => {
     tier_1_count: tier1.length,
     tier_2_count: tier2.length,
     tier_3_count: tier3.length,
+    tier_4_count: tier4.length,
     ingestion_status,
     _links: {
       self: { href: "/api/v1" },

@@ -15,14 +15,18 @@ const LEGAL_RISK_ORDER: Record<string, number> = {
 
 const TIER_COLORS: Record<number, { badge: string; dot: string }> = {
   1: {
+    badge: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
+    dot: "bg-green-600",
+  },
+  2: {
     badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300",
     dot: "bg-emerald-500",
   },
-  2: {
+  3: {
     badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
     dot: "bg-amber-500",
   },
-  3: {
+  4: {
     badge: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300",
     dot: "bg-red-500",
   },
@@ -95,11 +99,11 @@ export default function Coverage() {
       </div>
 
       <div className="mb-5 flex flex-wrap gap-3 text-xs">
-        {[1, 2, 3].map((tier) => (
+        {([1, 2, 3, 4] as const).map((tier) => (
           <div key={tier} className="flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${TIER_COLORS[tier]?.dot}`} />
             <span className="text-muted-foreground">
-              Tier {tier} — {tier === 1 ? "Live API" : tier === 2 ? "Local Dataset" : "Restricted"}
+              Tier {tier} — {tier === 1 ? "Live API" : tier === 2 ? "Bulk Dataset" : tier === 3 ? "Coming Soon" : "Restricted"}
             </span>
           </div>
         ))}
@@ -180,7 +184,7 @@ export default function Coverage() {
 
               {sorted.map((country) => {
                 const tierStyle = TIER_COLORS[country.tier];
-                const hasSource = country.tier === 1 || country.tier === 2;
+                const hasSource = country.tier === 1 || country.tier === 2 || country.tier === 3;
                 return (
                   <tr
                     key={country.country_code}

@@ -12,28 +12,39 @@ const TIERS = [
     tier: 1,
     label: "Tier 1 — Live API",
     description: "Real-time validation against authoritative government APIs. Full address confidence.",
-    color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800",
-    badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
+    color: "bg-green-100 border-green-300 dark:bg-green-950/40 dark:border-green-700",
+    badge: "bg-green-200 text-green-900 dark:bg-green-900 dark:text-green-100",
     icon: CheckCircle2,
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconColor: "text-green-700 dark:text-green-400",
     cost: "Free",
     risk: "Low",
   },
   {
     tier: 2,
-    label: "Tier 2 — Local Dataset",
-    description: "Validated against locally stored, openly licensed postcode databases. High confidence for postcode and city.",
+    label: "Tier 2 — Bulk Dataset",
+    description: "Validated against locally stored, openly licensed full address datasets. High confidence including street and house number.",
+    color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800",
+    badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
+    icon: Database,
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    cost: "Free",
+    risk: "Low",
+  },
+  {
+    tier: 3,
+    label: "Tier 3 — Coming Soon",
+    description: "Openly licensed data identified but not yet fully loaded. Currently validates postcode and city only via reference data.",
     color: "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800",
     badge: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-    icon: Database,
+    icon: AlertTriangle,
     iconColor: "text-amber-600 dark:text-amber-400",
     cost: "Free",
     risk: "Low–Medium",
   },
   {
-    tier: 3,
-    label: "Tier 3 — Restricted",
-    description: "Data rights are legally restricted. Validation returns null. Primarily affects GB (United Kingdom).",
+    tier: 4,
+    label: "Tier 4 — Restricted",
+    description: "Data is commercially and legally restricted. Validation returns null. Only affects GB (United Kingdom).",
     color: "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800",
     badge: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
     icon: XCircle,
@@ -101,8 +112,8 @@ export default function Home() {
           European Address Validation
         </h1>
         <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-          A REST API for validating full addresses across 20 European countries using
-          authoritative, openly licensed data sources. Most of Europe is free and low-risk.
+          An API for validating full addresses across 20 European countries using authoritative,
+          openly licensed data sources published as a public service. Most of Europe is free and low-risk.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/try" data-testid="link-cta-try">
@@ -120,11 +131,12 @@ export default function Home() {
       </div>
 
       {/* ── Stats ── */}
-      <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard label="Countries" value={meta?.country_count} sub="across Europe" />
         <StatCard label="Tier 1"    value={meta?.tier_1_count}  sub="live API" />
-        <StatCard label="Tier 2"    value={meta?.tier_2_count}  sub="local dataset" />
-        <StatCard label="Tier 3"    value={meta?.tier_3_count}  sub="restricted" />
+        <StatCard label="Tier 2"    value={meta?.tier_2_count}  sub="bulk dataset" />
+        <StatCard label="Tier 3"    value={meta?.tier_3_count}  sub="coming soon" />
+        <StatCard label="Tier 4"    value={meta?.tier_4_count}  sub="restricted" />
       </div>
 
       {/* ── Coverage Map ── */}
@@ -146,7 +158,7 @@ export default function Home() {
         <p className="mb-6 text-sm text-muted-foreground">
           Coverage quality varies by country. The vast majority of Europe is free and openly licensed.
         </p>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {TIERS.map(({ tier, label, description, color, badge, icon: Icon, iconColor, cost, risk }) => (
             <div key={tier} className={`rounded-lg border p-5 ${color}`} data-testid={`card-tier-${tier}`}>
               <div className="mb-3 flex items-start justify-between">

@@ -34,10 +34,12 @@ export interface ApiMeta {
   country_count: number;
   /** Countries with live authoritative API validation */
   tier_1_count: number;
-  /** Countries with bulk-local or format-reference validation */
+  /** Countries with full bulk address dataset loaded */
   tier_2_count: number;
-  /** Countries with restricted data (no validation) */
+  /** Countries with bulk dataset coming soon */
   tier_3_count: number;
+  /** Countries with restricted data (no validation) */
+  tier_4_count: number;
   _links: Links;
 }
 
@@ -104,7 +106,7 @@ export interface ValidationResult {
 }
 
 /**
- * 1=live API, 2=local dataset or format check, 3=restricted
+ * 1=live API, 2=bulk dataset loaded, 3=coming soon, 4=restricted
  */
 export type CountryCoverageTier = typeof CountryCoverageTier[keyof typeof CountryCoverageTier];
 
@@ -113,6 +115,7 @@ export const CountryCoverageTier = {
   NUMBER_1: 1,
   NUMBER_2: 2,
   NUMBER_3: 3,
+  NUMBER_4: 4,
 } as const;
 
 export type CountryCoverageValidationMethod = typeof CountryCoverageValidationMethod[keyof typeof CountryCoverageValidationMethod];

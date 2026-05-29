@@ -6,7 +6,7 @@ export type ValidationMethod =
   | "restricted";
 
 export type LegalRisk = "low" | "medium" | "high" | "very-high";
-export type Tier = 1 | 2 | 3;
+export type Tier = 1 | 2 | 3 | 4;
 
 export interface CountryEntry {
   country_code: string;
@@ -107,7 +107,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
     tier: 2,
     validation_method: "bulk-local",
     validation_method_description:
-      "Address is validated against a locally ingested copy of the Belgian BOSA Best Address dataset (CC0). Postcode, city, and house number are verified. Street name is not stored in the BOSA openaddress export.",
+      "Address is validated against a locally ingested copy of the Belgian BOSA Best Address dataset (CC0). Postcode, city, street name, and house number are all verified. Brussels addresses are stored in both Dutch and French so validation succeeds in either language.",
     data_source: "BOSA Best Address (openaddress.bosa.be)",
     data_source_url: "https://opendata.bosa.be/download/best/",
     licence: "CC0-1.0",
@@ -123,7 +123,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   AT: {
     country_code: "AT",
     country_name: "Austria",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -141,7 +141,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   DE: {
     country_code: "DE",
     country_name: "Germany",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -178,7 +178,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   ES: {
     country_code: "ES",
     country_name: "Spain",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -196,7 +196,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   PT: {
     country_code: "PT",
     country_name: "Portugal",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -214,7 +214,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   SE: {
     country_code: "SE",
     country_name: "Sweden",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -232,7 +232,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   FI: {
     country_code: "FI",
     country_name: "Finland",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -250,7 +250,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   PL: {
     country_code: "PL",
     country_name: "Poland",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -268,7 +268,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   CZ: {
     country_code: "CZ",
     country_name: "Czech Republic",
-    tier: 2,
+    tier: 3,
     validation_method: "bulk-local",
     validation_method_description:
       "Postcode and city are validated against a locally ingested copy of the GeoNames postal code dataset (CC BY 4.0). Street and house number cannot be verified at this time — the dataset provides postcode and locality coverage only.",
@@ -286,7 +286,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   IE: {
     country_code: "IE",
     country_name: "Ireland",
-    tier: 2,
+    tier: 3,
     validation_method: "format+reference",
     validation_method_description:
       "Eircode format is validated by regex and cross-checked against a postcode reference table. The authoritative Eircode database is commercially licensed and not available under an open licence.",
@@ -305,7 +305,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   CH: {
     country_code: "CH",
     country_name: "Switzerland",
-    tier: 2,
+    tier: 3,
     validation_method: "format+reference",
     validation_method_description:
       "Swiss postcode format is validated by regex and cross-checked against Swiss Post's publicly available postcode list.",
@@ -324,7 +324,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   LU: {
     country_code: "LU",
     country_name: "Luxembourg",
-    tier: 2,
+    tier: 3,
     validation_method: "format+reference",
     validation_method_description:
       "Luxembourg postcode format is validated by regex. Luxembourg uses a 4-digit numeric postcode system.",
@@ -342,7 +342,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   HU: {
     country_code: "HU",
     country_name: "Hungary",
-    tier: 2,
+    tier: 3,
     validation_method: "format-only",
     validation_method_description:
       "Hungarian postcode format is validated by regex only (4-digit numeric). No openly licensed authoritative address dataset is currently available.",
@@ -360,7 +360,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   RO: {
     country_code: "RO",
     country_name: "Romania",
-    tier: 2,
+    tier: 3,
     validation_method: "format-only",
     validation_method_description:
       "Romanian postcode format is validated by regex only (6-digit numeric). No openly licensed authoritative address dataset is currently available.",
@@ -378,7 +378,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
   GB: {
     country_code: "GB",
     country_name: "United Kingdom",
-    tier: 3,
+    tier: 4,
     validation_method: "restricted",
     validation_method_description:
       "Authoritative UK address data is not freely available. The Royal Mail Postcode Address File (PAF) and Ordnance Survey AddressBase products are commercially licensed. This API does not attempt validation and returns a clear explanation.",

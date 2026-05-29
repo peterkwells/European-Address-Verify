@@ -12,15 +12,17 @@ import type { CountryCoverage } from "@workspace/api-client-react";
 import { X, ExternalLink, Loader2, Terminal } from "lucide-react";
 
 const TIER_FILL: Record<number, string> = {
-  1: "#22c55e",
-  2: "#f59e0b",
-  3: "#ef4444",
+  1: "#16a34a",
+  2: "#22c55e",
+  3: "#f59e0b",
+  4: "#ef4444",
 };
 
 const TIER_LABELS: Record<number, { label: string; desc: string; color: string }> = {
-  1: { label: "Tier 1 — Live API",       desc: "Real-time authoritative validation", color: "text-emerald-700 dark:text-emerald-400" },
-  2: { label: "Tier 2 — Local Dataset",  desc: "Openly licensed bulk data",          color: "text-amber-700 dark:text-amber-400" },
-  3: { label: "Tier 3 — Restricted",     desc: "No open validation available",       color: "text-red-700 dark:text-red-400" },
+  1: { label: "Tier 1 — Live API",      desc: "Real-time authoritative validation",     color: "text-green-700 dark:text-green-400" },
+  2: { label: "Tier 2 — Bulk Dataset",  desc: "Full address dataset loaded",             color: "text-emerald-700 dark:text-emerald-400" },
+  3: { label: "Tier 3 — Coming Soon",   desc: "Full dataset not yet loaded",             color: "text-amber-700 dark:text-amber-400" },
+  4: { label: "Tier 4 — Restricted",    desc: "No open validation available",            color: "text-red-700 dark:text-red-400" },
 };
 
 const RISK_BADGE: Record<string, string> = {
@@ -72,7 +74,7 @@ function DetailPanel({
   });
 
   const tierInfo = coverage ? TIER_LABELS[coverage.tier] : null;
-  const canTry = coverage && coverage.tier !== 3;
+  const canTry = coverage && coverage.tier !== 4;
 
   return (
     <div
@@ -250,10 +252,10 @@ export function CoverageMap() {
     <div>
       {/* Legend */}
       <div className="mb-3 flex flex-wrap gap-4 text-xs">
-        {[1, 2, 3].map((tier) => (
+        {[1, 2, 3, 4].map((tier) => (
           <div key={tier} className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-sm border border-white/30" style={{ backgroundColor: TIER_FILL[tier] }} />
-            <span className="text-muted-foreground">{TIER_LABELS[tier].label}</span>
+            <span className="text-muted-foreground">{TIER_LABELS[tier]?.label}</span>
           </div>
         ))}
         <div className="flex items-center gap-2">
