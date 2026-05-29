@@ -45,7 +45,7 @@ const BOSA_URLS = [
 ];
 
 /** Prefix bumped whenever the ingester logic changes to force re-ingest. */
-const VERSION = "v2";
+const VERSION = "v3";
 const BATCH_SIZE = 5000;
 
 interface BosaRecord {
@@ -139,11 +139,22 @@ export async function ingestBosa(): Promise<void> {
         // Skip non-current addresses
         if (record["status"] && record["status"] !== "current") continue;
 
-        const city =
-          record["municipality_name_nl"]?.trim() ||
-          record["municipality_name_fr"]?.trim() ||
-          record["municipality_name_de"]?.trim() ||
-          undefined;
+        const cityNl = record["municipality_name_nl"]?.trim() || undefined;
+        const cityFr = record["municipality_name_fr"]?.trim() || undefined;
+        const cityDe = record["municipality_name_de"]?.trim() || undefined;
+
+        const regionCode = record["region_code"];
+        const isBrussels = regionCode === "BE-BRU";
+        const isWalloon = regionCode === "BE-WAL";
+
+        // Use the region's primary language for the city name so that users
+        // entering an address in the local language always get a match.
+        //   Flemish (BE-VLG): Dutch name
+        //   Walloon (BE-WAL): French name (German-speaking area has DE name)
+        //   Brussels (BE-BRU): Dutch as primary — French handled by bilingual row
+        const city = isWalloon
+          ? cityFr || cityDe || cityNl
+          : cityNl || cityFr || cityDe;
 
         const houseNumber = record["house_number"]?.trim() || undefined;
 
@@ -151,8 +162,8 @@ export async function ingestBosa(): Promise<void> {
         const fr = record["streetname_fr"]?.trim() || undefined;
         const de = record["streetname_de"]?.trim() || undefined;
 
-        // Primary street name: NL preferred, then FR, then DE
-        const primary = nl || fr || de;
+        // Primary street name: region-language preferred
+        const primary = isWalloon ? fr || de || nl : nl || fr || de;
 
         batch.push({
           country_code: "BE",
@@ -163,14 +174,13 @@ export async function ingestBosa(): Promise<void> {
           source_dataset: "BOSA Best Address",
         });
 
-        // For Brussels bilingual addresses: also store the French name as a
-        // separate row so validation works in either language.
-        const isBrussels = record["region_code"] === "BE-BRU";
+        // For Brussels: store a second row with French street + French city so
+        // validation succeeds whether the user enters Dutch or French.
         if (isBrussels && fr && nl && fr !== nl) {
           batch.push({
             country_code: "BE",
             postcode,
-            city,
+            city: cityFr || cityNl,
             street: fr,
             house_number: houseNumber,
             source_dataset: "BOSA Best Address",
