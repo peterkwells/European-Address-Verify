@@ -210,7 +210,7 @@ export default function Home() {
             <span className="text-xs font-medium text-muted-foreground">Example — Validate a French address</span>
           </div>
           <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-foreground" data-testid="code-quickstart">
-            <code>{`GET /api/v1/addresses/validate?country=FR&postcode=75001&street=Rue+de+Rivoli&house_number=12
+            <code>{`GET https://european-address-verify.replit.app/api/v1/addresses/validate?country=FR&postcode=75001&street=Rue+de+Rivoli&house_number=12
 
 {
   "valid": true,
