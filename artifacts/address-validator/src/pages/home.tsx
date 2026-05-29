@@ -39,7 +39,9 @@ const TIERS = [
     icon: AlertTriangle,
     iconColor: "text-amber-600 dark:text-amber-400",
     cost: "Free",
-    risk: "Low–Medium",
+    costLabel: "Expected Cost",
+    risk: "Low",
+    riskLabel: "Expected Risk",
   },
   {
     tier: 4,
@@ -49,8 +51,8 @@ const TIERS = [
     badge: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
     icon: XCircle,
     iconColor: "text-red-600 dark:text-red-400",
-    cost: "Very expensive",
-    risk: "Very High",
+    cost: "Requires negotiation",
+    risk: "Medium",
   },
 ];
 
@@ -159,7 +161,7 @@ export default function Home() {
           Coverage quality varies by country. The vast majority of Europe is free and openly licensed.
         </p>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {TIERS.map(({ tier, label, description, color, badge, icon: Icon, iconColor, cost, risk }) => (
+          {TIERS.map(({ tier, label, description, color, badge, icon: Icon, iconColor, cost, costLabel, risk, riskLabel }) => (
             <div key={tier} className={`rounded-lg border p-5 ${color}`} data-testid={`card-tier-${tier}`}>
               <div className="mb-3 flex items-start justify-between">
                 <Icon className={`h-5 w-5 ${iconColor}`} />
@@ -169,11 +171,11 @@ export default function Home() {
               <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{description}</p>
               <div className="flex gap-4 text-xs">
                 <div>
-                  <span className="font-medium text-muted-foreground">Cost: </span>
+                  <span className="font-medium text-muted-foreground">{costLabel ?? "Cost"}: </span>
                   <span className="text-foreground">{cost}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-muted-foreground">Risk: </span>
+                  <span className="font-medium text-muted-foreground">{riskLabel ?? "Risk"}: </span>
                   <span className="text-foreground">{risk}</span>
                 </div>
               </div>
@@ -188,12 +190,12 @@ export default function Home() {
           <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
           <div>
             <h3 className="text-sm font-semibold text-red-900 dark:text-red-200">
-              United Kingdom (GB) — Very High Legal Risk
+              United Kingdom (GB) — Medium Risk
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-red-700 dark:text-red-300">
-              UK address data is commercially locked by two overlapping monopolies. Royal Mail licenses the Postcode Address File (PAF) — the definitive record of postal addresses — and Ordnance Survey licenses AddressBase, which links property identifiers (UPRNs) to full address attributes. Both are required for a complete address service; neither is freely available for anyone to use. This API returns{" "}
+              UK address data is commercially locked by two overlapping monopolies. Royal Mail licenses the Postcode Address File (PAF) — the definitive record of postal addresses — and Ordnance Survey licenses AddressBase, which links property identifiers (UPRNs) to full address attributes. Both are required for a complete address service and both are willing to legally enforce their rights; neither is freely available for anyone to use. This API returns{" "}
               <code className="rounded bg-red-200/60 px-1 font-mono text-xs dark:bg-red-900/60">valid: null</code>{" "}
-              for GB addresses. We strongly recommend evaluating licensed PAF and AddressBase providers before building any production address service for the United Kingdom.
+              for GB addresses. We recommend evaluating licensed PAF and AddressBase providers and checking with a lawyer before building any production address service for the United Kingdom.
             </p>
           </div>
         </div>
