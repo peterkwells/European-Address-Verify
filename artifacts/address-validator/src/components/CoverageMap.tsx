@@ -229,7 +229,7 @@ export function CoverageMap() {
       const coverage = iso ? coverageByCode[iso] : undefined;
       if (!coverage) return;
       layer.bindTooltip(
-        `<strong>${coverage.country_name}</strong><br/>Tier ${coverage.tier} &mdash; ${coverage.legal_risk} risk`,
+        `<strong>${coverage.country_name}</strong><br/>Tier ${coverage.tier} &mdash; ${coverage.legal_risk.replace(/-/g, " ")} risk`,
         { sticky: true, className: "leaflet-tooltip-custom" },
       );
       layer.on({

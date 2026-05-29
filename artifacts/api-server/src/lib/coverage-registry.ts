@@ -389,7 +389,7 @@ export const REGISTRY: Record<string, CountryEntry> = {
     cost: "Commercial licensing required — typically £thousands per year",
     cost_description:
       "Royal Mail PAF licences start at several thousand pounds per year for basic use and scale significantly with volume and application type. OS AddressBase (which includes UPRN — Unique Property Reference Numbers) is licensed through the Public Sector Mapping Agreement (PSMA) for public sector bodies, but commercial use requires separate negotiation with Ordnance Survey. Costs for commercial licensees can reach tens of thousands of pounds annually.",
-    legal_risk: "very-high",
+    legal_risk: "medium",
     legal_risk_notes:
       "UK address data carries very high legal risk for three distinct but overlapping reasons:\n\n" +
       "1. **Commercial monopoly on postal addresses**: The Postcode Address File and AddressBase are the definitive UK address databases and are commercially licensed by Royal Mail and Ordnance Survey. Use without a licence is a breach of copyright; unlicensed scraping, copying, or redistribution has been subject to legal action. Licences are tiered by use case and volume and typically cost several thousand pounds per year at minimum.\n\n" +
